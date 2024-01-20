@@ -30,7 +30,7 @@ where
     T: arbitrary::Arbitrary<'a> + CoordFloat,
 {
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-        let coords = u.arbitrary::<Vec<Coord<T>>>()?;
+        let coords = u.arbitrary::<RVec<Coord<T>>>()?;
         if coords.len() < 2 {
             Err(arbitrary::Error::IncorrectFormat)
         } else {
@@ -50,7 +50,7 @@ where
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         Ok(Self::new(
             u.arbitrary::<LineString<T>>()?,
-            u.arbitrary::<Vec<LineString<T>>>()?,
+            u.arbitrary::<RVec<LineString<T>>>()?,
         ))
     }
 }
@@ -60,7 +60,7 @@ where
     T: arbitrary::Arbitrary<'a> + CoordFloat,
 {
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-        u.arbitrary::<Vec<Point<T>>>().map(Self)
+        u.arbitrary::<RVec<Point<T>>>().map(Self)
     }
 }
 
@@ -69,7 +69,7 @@ where
     T: arbitrary::Arbitrary<'a> + CoordFloat,
 {
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-        u.arbitrary::<Vec<LineString<T>>>().map(Self)
+        u.arbitrary::<RVec<LineString<T>>>().map(Self)
     }
 }
 
@@ -78,7 +78,7 @@ where
     T: arbitrary::Arbitrary<'a> + CoordFloat,
 {
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
-        u.arbitrary::<Vec<Polygon<T>>>().map(Self)
+        u.arbitrary::<RVec<Polygon<T>>>().map(Self)
     }
 }
 

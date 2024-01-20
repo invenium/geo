@@ -214,6 +214,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::*;
     use crate::Point;
 
@@ -225,7 +226,7 @@ mod test {
         let c = Point::new(1., 2.);
 
         // Verify open linestrings return None
-        let mut ls = LineString::from(vec![a.0, b.0, c.0]);
+        let mut ls = LineString::from(rvec![a.0, b.0, c.0]);
         assert!(ls.winding_order().is_none());
 
         ls.0.push(ls.0[0]);
@@ -243,7 +244,7 @@ mod test {
         let c = Point::new(1, 2);
 
         // Verify open linestrings return None
-        let mut ls = LineString::from(vec![a.0, b.0, c.0]);
+        let mut ls = LineString::from(rvec![a.0, b.0, c.0]);
         assert!(ls.winding_order().is_none());
 
         ls.0.push(ls.0[0]);

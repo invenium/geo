@@ -184,6 +184,8 @@ impl<F: GeoFloat> ClosestPoint<F> for Geometry<F> {
 
 #[cfg(test)]
 mod tests {
+    use abi_stable::rvec;
+    use abi_stable::std_types::RVec;
     use super::*;
     use crate::algorithm::{Contains, Translate};
     use crate::{point, polygon};
@@ -214,7 +216,7 @@ mod tests {
     closest!(perpendicular_from_50_50, (0.0, 100.0) => Closest::SinglePoint(Point::new(50.0, 50.0)));
 
     fn a_square(width: f32) -> LineString<f32> {
-        LineString::from(vec![
+        LineString::from(rvec![
             (0.0, 0.0),
             (width, 0.0),
             (width, width),
@@ -235,7 +237,7 @@ mod tests {
 
     #[test]
     fn line_string_with_single_element_behaves_like_line() {
-        let points = vec![(0.0, 0.0), (100.0, 100.0)];
+        let points = rvec![(0.0, 0.0), (100.0, 100.0)];
         let line_string = LineString::<f32>::from(points.clone());
         let line = Line::new(points[0], points[1]);
 
@@ -260,7 +262,7 @@ mod tests {
 
     #[test]
     fn empty_line_string_is_indeterminate() {
-        let ls = LineString::new(Vec::new());
+        let ls = LineString::new(RVec::new());
         let p = Point::new(0.0, 0.0);
 
         let got = ls.closest_point(&p);
@@ -272,7 +274,7 @@ mod tests {
         let square: LineString<f32> = a_square(100.0);
         let ring_1 = a_square(20.0).translate(10.0, 10.0);
         let ring_2 = a_square(10.0).translate(70.0, 60.0);
-        Polygon::new(square, vec![ring_1, ring_2])
+        Polygon::new(square, rvec![ring_1, ring_2])
     }
 
     #[test]
@@ -338,7 +340,7 @@ mod tests {
         let square_10 = square_1.translate(10.0, 10.0);
         let square_50 = square_1.translate(50.0, 50.0);
 
-        let multi_polygon = MultiPolygon::new(vec![square_1, square_10, square_50]);
+        let multi_polygon = MultiPolygon::new(rvec![square_1, square_10, square_50]);
         let result = multi_polygon.closest_point(&point!(x: 8.0, y: 8.0));
         assert_eq!(result, Closest::SinglePoint(point!(x: 10.0, y: 10.0)));
 

@@ -1,3 +1,4 @@
+use abi_stable::rvec;
 use geo_types::{private_utils::get_bounding_rect, Line};
 
 use crate::{
@@ -114,7 +115,7 @@ impl<T: GeoNum> MonoPoly<T> {
         let geom = LineString(top);
         debug_assert!(geom.is_closed());
 
-        Polygon::new(geom, vec![])
+        Polygon::new(geom, rvec![])
     }
 }
 

@@ -1,3 +1,4 @@
+use abi_stable::std_types::RVec;
 use super::{swap_remove_to_first, trivial_hull};
 use crate::kernels::*;
 use crate::{Coord, GeoNum, LineString};
@@ -28,7 +29,7 @@ where
     }
 
     // Allocate output vector
-    let mut output = Vec::with_capacity(points.len());
+    let mut output = RVec::with_capacity(points.len());
 
     // Find lexicographically least point and add to hull
     use crate::utils::least_index;
@@ -89,7 +90,7 @@ where
 mod test {
     use super::*;
     use crate::IsConvex;
-    fn test_convexity<T: GeoNum>(mut initial: Vec<Coord<T>>) {
+    fn test_convexity<T: GeoNum>(mut initial: RVec<Coord<T>>) {
         let hull = graham_hull(&mut initial, false);
         assert!(hull.is_strictly_ccw_convex());
         let hull = graham_hull(&mut initial, true);

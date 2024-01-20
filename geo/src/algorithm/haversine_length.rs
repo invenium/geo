@@ -19,10 +19,11 @@ pub trait HaversineLength<T, RHS = Self> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo::prelude::*;
     /// use geo::LineString;
     ///
-    /// let linestring = LineString::<f64>::from(vec![
+    /// let linestring = LineString::<f64>::from(rvec![
     ///     // New York City
     ///     (-74.006, 40.7128),
     ///     // London

@@ -16,10 +16,11 @@ use std::ops::AddAssign;
 /// # Examples
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo::{LineString, point};
 /// use geo::LineLocatePoint;
 ///
-/// let linestring: LineString = vec![
+/// let linestring: LineString = rvec![
 ///     [-1.0, 0.0],
 ///     [0.0, 0.0],
 ///     [0.0, 1.0]
@@ -108,6 +109,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::*;
     use crate::{coord, point};
     use num_traits::Float;
@@ -211,7 +213,7 @@ mod test {
         assert_eq!(ring.line_locate_point(&pt), None);
 
         // point is equidistant to two line segments - return the fraction from the first closest
-        let line: LineString = LineString::new(vec![
+        let line: LineString = LineString::new(rvec![
             (0.0, 0.0).into(),
             (1.0, 0.0).into(),
             (1.0, 1.0).into(),
@@ -220,7 +222,7 @@ mod test {
         let pt = point!(x: 0.0, y: 0.5);
         assert_eq!(line.line_locate_point(&pt), Some(0.0));
 
-        let line: LineString = LineString::new(vec![
+        let line: LineString = LineString::new(rvec![
             (1.0, 1.0).into(),
             (1.0, 1.0).into(),
             (1.0, 1.0).into(),
@@ -229,7 +231,7 @@ mod test {
         assert_eq!(line.line_locate_point(&pt), Some(0.0));
 
         // line contains inf or nan
-        let line: LineString = LineString::new(vec![
+        let line: LineString = LineString::new(rvec![
             coord! { x: 1.0, y: 1.0 },
             coord! {
                 x: Float::nan(),
@@ -240,7 +242,7 @@ mod test {
         let pt = point!(x: 2.0, y: 2.0);
         assert_eq!(line.line_locate_point(&pt), None);
 
-        let line: LineString = LineString::new(vec![
+        let line: LineString = LineString::new(rvec![
             coord! { x: 1.0, y: 1.0 },
             coord! {
                 x: Float::infinity(),
@@ -250,7 +252,7 @@ mod test {
         ]);
         let pt = point!(x: 2.0, y: 2.0);
         assert_eq!(line.line_locate_point(&pt), None);
-        let line: LineString = LineString::new(vec![
+        let line: LineString = LineString::new(rvec![
             coord! { x: 1.0, y: 1.0 },
             coord! {
                 x: Float::neg_infinity(),

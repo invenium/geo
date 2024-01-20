@@ -1,3 +1,4 @@
+use abi_stable::rvec;
 use crate::{
     CoordNum, Geometry, Line, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
     Polygon, Rect, Triangle,
@@ -28,7 +29,7 @@ where
 {
     /// Create a MultiPoint with repeated points removed.
     fn remove_repeated_points(&self) -> Self {
-        let mut points = vec![];
+        let mut points = rvec![];
         for p in self.0.iter() {
             if !points.contains(p) {
                 points.push(*p);
@@ -39,7 +40,7 @@ where
 
     /// Remove repeated points from a MultiPoint inplace.
     fn remove_repeated_points_mut(&mut self) {
-        let mut points = vec![];
+        let mut points = rvec![];
         for p in self.0.iter() {
             if !points.contains(p) {
                 points.push(*p);
@@ -55,14 +56,16 @@ where
 {
     /// Create a LineString with consecutive repeated points removed.
     fn remove_repeated_points(&self) -> Self {
-        let mut coords = self.0.clone();
+        let mut coords = self.0.to_vec();
         coords.dedup();
-        LineString(coords)
+        LineString(coords.into())
     }
 
     /// Remove consecutive repeated points from a LineString inplace.
     fn remove_repeated_points_mut(&mut self) {
-        self.0.dedup();
+        let mut coords = self.0.to_vec();
+        coords.dedup();
+        self.0 = coords.into()
     }
 }
 
@@ -225,6 +228,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use crate::RemoveRepeatedPoints;
     use crate::{
         Coord, GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
@@ -232,7 +236,7 @@ mod test {
     };
 
     fn make_test_mp_integer() -> MultiPoint<i32> {
-        MultiPoint(vec![
+        MultiPoint(rvec![
             Point::new(0, 0),
             Point::new(1, 1),
             Point::new(1, 1),
@@ -243,11 +247,11 @@ mod test {
     }
 
     fn make_result_mp_integer() -> MultiPoint<i32> {
-        MultiPoint(vec![Point::new(0, 0), Point::new(1, 1), Point::new(2, 2)])
+        MultiPoint(rvec![Point::new(0, 0), Point::new(1, 1), Point::new(2, 2)])
     }
 
     fn make_test_mp1() -> MultiPoint {
-        MultiPoint(vec![
+        MultiPoint(rvec![
             Point::new(0., 0.),
             Point::new(1., 1.),
             Point::new(1., 1.),
@@ -258,7 +262,7 @@ mod test {
     }
 
     fn make_result_mp1() -> MultiPoint {
-        MultiPoint(vec![
+        MultiPoint(rvec![
             Point::new(0., 0.),
             Point::new(1., 1.),
             Point::new(2., 2.),
@@ -266,7 +270,7 @@ mod test {
     }
 
     fn make_test_line1() -> LineString {
-        LineString(vec![
+        LineString(rvec![
             Coord { x: 0., y: 0. },
             Coord { x: 1., y: 1. },
             Coord { x: 1., y: 1. },
@@ -278,7 +282,7 @@ mod test {
     }
 
     fn make_result_line1() -> LineString {
-        LineString(vec![
+        LineString(rvec![
             Coord { x: 0., y: 0. },
             Coord { x: 1., y: 1. },
             Coord { x: 2., y: 2. },
@@ -287,7 +291,7 @@ mod test {
     }
 
     fn make_test_line2() -> LineString {
-        LineString(vec![
+        LineString(rvec![
             Coord { x: 10., y: 10. },
             Coord { x: 11., y: 11. },
             Coord { x: 11., y: 11. },
@@ -299,7 +303,7 @@ mod test {
     }
 
     fn make_result_line2() -> LineString {
-        LineString(vec![
+        LineString(rvec![
             Coord { x: 10., y: 10. },
             Coord { x: 11., y: 11. },
             Coord { x: 12., y: 12. },
@@ -309,7 +313,7 @@ mod test {
 
     fn make_test_poly1() -> Polygon {
         Polygon::new(
-            LineString(vec![
+            LineString(rvec![
                 Coord { x: 0., y: 0. },
                 Coord { x: 1., y: 1. },
                 Coord { x: 1., y: 1. },
@@ -318,25 +322,25 @@ mod test {
                 Coord { x: 0., y: 2. },
                 Coord { x: 0., y: 0. },
             ]),
-            vec![],
+            rvec![],
         )
     }
 
     fn make_result_poly1() -> Polygon {
         Polygon::new(
-            LineString(vec![
+            LineString(rvec![
                 Coord { x: 0., y: 0. },
                 Coord { x: 1., y: 1. },
                 Coord { x: 0., y: 2. },
                 Coord { x: 0., y: 0. },
             ]),
-            vec![],
+            rvec![],
         )
     }
 
     fn make_test_poly2() -> Polygon {
         Polygon::new(
-            LineString(vec![
+            LineString(rvec![
                 Coord { x: 10., y: 10. },
                 Coord { x: 11., y: 11. },
                 Coord { x: 11., y: 11. },
@@ -345,19 +349,19 @@ mod test {
                 Coord { x: 10., y: 12. },
                 Coord { x: 10., y: 10. },
             ]),
-            vec![],
+            rvec![],
         )
     }
 
     fn make_result_poly2() -> Polygon {
         Polygon::new(
-            LineString(vec![
+            LineString(rvec![
                 Coord { x: 10., y: 10. },
                 Coord { x: 11., y: 11. },
                 Coord { x: 10., y: 12. },
                 Coord { x: 10., y: 10. },
             ]),
-            vec![],
+            rvec![],
         )
     }
 
@@ -395,31 +399,31 @@ mod test {
 
     #[test]
     fn test_remove_repeated_points_multilinestring() {
-        let mls = MultiLineString(vec![make_test_line1(), make_test_line2()]);
+        let mls = MultiLineString(rvec![make_test_line1(), make_test_line2()]);
 
-        let expected = MultiLineString(vec![make_result_line1(), make_result_line2()]);
+        let expected = MultiLineString(rvec![make_result_line1(), make_result_line2()]);
 
         assert_eq!(mls.remove_repeated_points(), expected);
     }
 
     #[test]
     fn test_remove_repeated_points_multipolygon() {
-        let mpoly = MultiPolygon(vec![make_test_poly1(), make_test_poly2()]);
+        let mpoly = MultiPolygon(rvec![make_test_poly1(), make_test_poly2()]);
 
-        let expected = MultiPolygon(vec![make_result_poly1(), make_result_poly2()]);
+        let expected = MultiPolygon(rvec![make_result_poly1(), make_result_poly2()]);
 
         assert_eq!(mpoly.remove_repeated_points(), expected);
     }
 
     #[test]
     fn test_remove_repeated_points_geometrycollection() {
-        let gc = GeometryCollection::new_from(vec![
+        let gc = GeometryCollection::new_from(rvec![
             make_test_mp1().into(),
             make_test_line1().into(),
             make_test_poly1().into(),
         ]);
 
-        let expected = GeometryCollection::new_from(vec![
+        let expected = GeometryCollection::new_from(rvec![
             make_result_mp1().into(),
             make_result_line1().into(),
             make_result_poly1().into(),
@@ -466,32 +470,32 @@ mod test {
 
     #[test]
     fn test_remove_repeated_points_mut_multilinestring() {
-        let mut mls = MultiLineString(vec![make_test_line1(), make_test_line2()]);
+        let mut mls = MultiLineString(rvec![make_test_line1(), make_test_line2()]);
         mls.remove_repeated_points_mut();
-        let expected = MultiLineString(vec![make_result_line1(), make_result_line2()]);
+        let expected = MultiLineString(rvec![make_result_line1(), make_result_line2()]);
 
         assert_eq!(mls, expected);
     }
 
     #[test]
     fn test_remove_repeated_points_mut_multipolygon() {
-        let mut mpoly = MultiPolygon(vec![make_test_poly1(), make_test_poly2()]);
+        let mut mpoly = MultiPolygon(rvec![make_test_poly1(), make_test_poly2()]);
         mpoly.remove_repeated_points_mut();
-        let expected = MultiPolygon(vec![make_result_poly1(), make_result_poly2()]);
+        let expected = MultiPolygon(rvec![make_result_poly1(), make_result_poly2()]);
 
         assert_eq!(mpoly, expected);
     }
 
     #[test]
     fn test_remove_repeated_points_mut_geometrycollection() {
-        let mut gc = GeometryCollection::new_from(vec![
+        let mut gc = GeometryCollection::new_from(rvec![
             make_test_mp1().into(),
             make_test_line1().into(),
             make_test_poly1().into(),
         ]);
         gc.remove_repeated_points_mut();
 
-        let expected = GeometryCollection::new_from(vec![
+        let expected = GeometryCollection::new_from(rvec![
             make_result_mp1().into(),
             make_result_line1().into(),
             make_result_poly1().into(),

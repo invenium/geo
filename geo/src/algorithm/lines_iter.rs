@@ -162,7 +162,7 @@ impl<'a, Iter1: Iterator<Item = &'a Iter2>, Iter2: LinesIter<'a>> Iterator
 
 #[cfg(test)]
 mod test {
-
+    use abi_stable::rvec;
     use super::LinesIter;
     use crate::{
         coord, line_string, polygon, Line, LineString, MultiLineString, MultiPolygon, Rect,
@@ -206,7 +206,7 @@ mod test {
 
     #[test]
     fn test_multi_line_string() {
-        let mls = MultiLineString::new(vec![
+        let mls = MultiLineString::new(rvec![
             line_string![],
             line_string![(x: 0., y: 0.), (x: 1., y: 1.)],
             line_string![(x: 0., y: 0.), (x: 1., y: 1.), (x:2., y: 2.)],
@@ -250,7 +250,7 @@ mod test {
 
     #[test]
     fn test_multi_polygon() {
-        let mp = MultiPolygon::new(vec![
+        let mp = MultiPolygon::new(rvec![
             polygon!(
                 exterior: [(x: 0., y: 0.), (x: 0., y: 10.), (x: 10., y: 10.), (x: 10., y: 0.)],
                 interiors: [[(x: 1., y: 1.), (x: 1., y: 2.), (x: 2., y: 2.), (x: 2., y: 1.)]],

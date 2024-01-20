@@ -5,5 +5,6 @@ edition = "2021"
 publish = false
 
 [dependencies]
+abi_stable = "0.11.3"
 wkt = { version = "0.10.0", default-features = false }
 geo-types = { path = "../geo-types" }

@@ -215,6 +215,8 @@ fn bounding_rect_merge<T: CoordNum>(a: Rect<T>, b: Rect<T>) -> Rect<T> {
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
+    use abi_stable::std_types::RVec;
     use super::bounding_rect_merge;
     use crate::line_string;
     use crate::BoundingRect;
@@ -257,7 +259,7 @@ mod test {
     }
     #[test]
     fn multilinestring_test() {
-        let multiline = MultiLineString::new(vec![
+        let multiline = MultiLineString::new(rvec![
             line_string![(x: 1., y: 1.), (x: -40., y: 1.)],
             line_string![(x: 1., y: 1.), (x: 50., y: 1.)],
             line_string![(x: 1., y: 1.), (x: 1., y: -60.)],
@@ -268,7 +270,7 @@ mod test {
     }
     #[test]
     fn multipoint_test() {
-        let multipoint = MultiPoint::from(vec![(1., 1.), (2., -2.), (-3., -3.), (-4., 4.)]);
+        let multipoint = MultiPoint::from(rvec![(1., 1.), (2., -2.), (-3., -3.), (-4., 4.)]);
         let bounding_rect = Rect::new(coord! { x: -4., y: -3. }, coord! { x: 2., y: 4. });
         assert_eq!(bounding_rect, multipoint.bounding_rect().unwrap());
     }
@@ -282,12 +284,12 @@ mod test {
             (x: 0., y: 0.),
         ];
         let line_bounding_rect = linestring.bounding_rect().unwrap();
-        let poly = Polygon::new(linestring, Vec::new());
+        let poly = Polygon::new(linestring, RVec::new());
         assert_eq!(line_bounding_rect, poly.bounding_rect().unwrap());
     }
     #[test]
     fn multipolygon_test() {
-        let mpoly = MultiPolygon::new(vec![
+        let mpoly = MultiPolygon::new(rvec![
             polygon![(x: 0., y: 0.), (x: 50., y: 0.), (x: 0., y: -70.), (x: 0., y: 0.)],
             polygon![(x: 0., y: 0.), (x: 5., y: 0.), (x: 0., y: 80.), (x: 0., y: 0.)],
             polygon![(x: 0., y: 0.), (x: -60., y: 0.), (x: 0., y: 6.), (x: 0., y: 0.)],
@@ -332,7 +334,7 @@ mod test {
     fn geometry_collection_bounding_rect_test() {
         assert_eq!(
             Some(Rect::new(coord! { x: 0., y: 0. }, coord! { x: 1., y: 2. })),
-            GeometryCollection::new_from(vec![
+            GeometryCollection::new_from(rvec![
                 Geometry::Point(point! { x: 0., y: 0. }),
                 Geometry::Point(point! { x: 1., y: 2. }),
             ])

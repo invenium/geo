@@ -6,6 +6,8 @@ use crate::{
 };
 use rstar::{RTree, RTreeNum};
 use std::collections::VecDeque;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 /// Returns a polygon which covers a geometry. Unlike convex hulls, which also cover
 /// their geometry, a concave hull does so while trying to further minimize its area by
@@ -52,8 +54,8 @@ where
 {
     type Scalar = T;
     fn concave_hull(&self, concavity: Self::Scalar) -> Polygon<Self::Scalar> {
-        let mut points: Vec<_> = self.exterior().0.clone();
-        Polygon::new(concave_hull(&mut points, concavity), vec![])
+        let mut points: RVec<_> = self.exterior().0.clone();
+        Polygon::new(concave_hull(&mut points, concavity), rvec![])
     }
 }
 
@@ -68,7 +70,7 @@ where
             .iter()
             .flat_map(|elem| elem.exterior().0.clone())
             .collect();
-        Polygon::new(concave_hull(&mut aggregated, concavity), vec![])
+        Polygon::new(concave_hull(&mut aggregated, concavity), rvec![])
     }
 }
 
@@ -78,7 +80,7 @@ where
 {
     type Scalar = T;
     fn concave_hull(&self, concavity: Self::Scalar) -> Polygon<Self::Scalar> {
-        Polygon::new(concave_hull(&mut self.0.clone(), concavity), vec![])
+        Polygon::new(concave_hull(&mut self.0.clone(), concavity), rvec![])
     }
 }
 
@@ -89,7 +91,7 @@ where
     type Scalar = T;
     fn concave_hull(&self, concavity: T) -> Polygon<T> {
         let mut aggregated: Vec<Coord<T>> = self.iter().flat_map(|elem| elem.0.clone()).collect();
-        Polygon::new(concave_hull(&mut aggregated, concavity), vec![])
+        Polygon::new(concave_hull(&mut aggregated, concavity), rvec![])
     }
 }
 
@@ -100,7 +102,7 @@ where
     type Scalar = T;
     fn concave_hull(&self, concavity: T) -> Polygon<T> {
         let mut coordinates: Vec<Coord<T>> = self.iter().map(|point| point.0).collect();
-        Polygon::new(concave_hull(&mut coordinates, concavity), vec![])
+        Polygon::new(concave_hull(&mut coordinates, concavity), rvec![])
     }
 }
 
@@ -198,7 +200,7 @@ where
     }
 
     //Get points in overall dataset that aren't on the exterior linestring of the hull
-    let hull_tree: RTree<Coord<T>> = RTree::bulk_load(hull.clone().0);
+    let hull_tree: RTree<Coord<T>> = RTree::bulk_load(hull.0.to_vec());
 
     let interior_coords: Vec<Coord<T>> = coords
         .iter()
@@ -208,7 +210,7 @@ where
     let mut interior_points_tree: RTree<Coord<T>> = RTree::bulk_load(interior_coords);
     let mut line_tree: RTree<Line<T>> = RTree::new();
 
-    let mut concave_list: Vec<Point<T>> = vec![];
+    let mut concave_list: RVec<Point<T>> = rvec![];
     let lines = hull.lines();
     let mut line_queue: VecDeque<Line<T>> = VecDeque::new();
 
@@ -410,7 +412,7 @@ mod test {
              (x: 3.0, y: 1.0),
              (x: 3.0, y: 2.0)
         ];
-        let mls = MultiLineString::new(vec![v1, v2]);
+        let mls = MultiLineString::new(rvec![v1, v2]);
         let correct = vec![
             Coord::from((4.0, 0.0)),
             Coord::from((4.0, 4.0)),
@@ -434,9 +436,9 @@ mod test {
              (x: 3.0, y: 1.0),
              (x: 3.0, y: 2.0)
         ];
-        let multipolygon = MultiPolygon::new(vec![v1, v2]);
+        let multipolygon = MultiPolygon::new(rvec![v1, v2]);
         let res = multipolygon.concave_hull(2.0);
-        let correct = vec![
+        let correct = rvec![
             Coord::from((4.0, 0.0)),
             Coord::from((4.0, 4.0)),
             Coord::from((3.0, 2.0)),

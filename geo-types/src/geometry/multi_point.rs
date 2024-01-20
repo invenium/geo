@@ -3,9 +3,9 @@ use crate::{CoordNum, Point};
 #[cfg(any(feature = "approx", test))]
 use approx::{AbsDiffEq, RelativeEq};
 
-use alloc::vec;
-use alloc::vec::Vec;
 use core::iter::FromIterator;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 /// A collection of [`Point`s](struct.Point.html). Can
 /// be created from a `Vec` of `Point`s, or from an
@@ -24,28 +24,29 @@ use core::iter::FromIterator;
 /// Iterating over a `MultiPoint` yields the `Point`s inside.
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::{MultiPoint, Point};
-/// let points: MultiPoint<_> = vec![(0., 0.), (1., 2.)].into();
+/// let points: MultiPoint<_> = rvec![(0., 0.), (1., 2.)].into();
 /// for point in points {
 ///     println!("Point x = {}, y = {}", point.x(), point.y());
 /// }
 /// ```
 #[derive(Eq, PartialEq, Clone, Debug, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct MultiPoint<T: CoordNum = f64>(pub Vec<Point<T>>);
+pub struct MultiPoint<T: CoordNum = f64>(pub RVec<Point<T>>);
 
 impl<T: CoordNum, IP: Into<Point<T>>> From<IP> for MultiPoint<T> {
     /// Convert a single `Point` (or something which can be converted to a
     /// `Point`) into a one-member `MultiPoint`
     fn from(x: IP) -> Self {
-        Self(vec![x.into()])
+        Self(rvec![x.into()])
     }
 }
 
-impl<T: CoordNum, IP: Into<Point<T>>> From<Vec<IP>> for MultiPoint<T> {
+impl<T: CoordNum, IP: Into<Point<T>>> From<RVec<IP>> for MultiPoint<T> {
     /// Convert a `Vec` of `Points` (or `Vec` of things which can be converted
     /// to a `Point`) into a `MultiPoint`.
-    fn from(v: Vec<IP>) -> Self {
+    fn from(v: RVec<IP>) -> Self {
         Self(v.into_iter().map(|p| p.into()).collect())
     }
 }
@@ -60,7 +61,7 @@ impl<T: CoordNum, IP: Into<Point<T>>> FromIterator<IP> for MultiPoint<T> {
 /// Iterate over the `Point`s in this `MultiPoint`.
 impl<T: CoordNum> IntoIterator for MultiPoint<T> {
     type Item = Point<T>;
-    type IntoIter = ::alloc::vec::IntoIter<Point<T>>;
+    type IntoIter = abi_stable::std_types::vec::IntoIter<Point<T>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -86,7 +87,7 @@ impl<'a, T: CoordNum> IntoIterator for &'a mut MultiPoint<T> {
 }
 
 impl<T: CoordNum> MultiPoint<T> {
-    pub fn new(value: Vec<Point<T>>) -> Self {
+    pub fn new(value: RVec<Point<T>>) -> Self {
         Self(value)
     }
 
@@ -122,11 +123,12 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::MultiPoint;
     /// use geo_types::point;
     ///
-    /// let a = MultiPoint::new(vec![point![x: 0., y: 0.], point![x: 10., y: 10.]]);
-    /// let b = MultiPoint::new(vec![point![x: 0., y: 0.], point![x: 10.001, y: 10.]]);
+    /// let a = MultiPoint::new(rvec![point![x: 0., y: 0.], point![x: 10., y: 10.]]);
+    /// let b = MultiPoint::new(rvec![point![x: 0., y: 0.], point![x: 10.001, y: 10.]]);
     ///
     /// approx::assert_relative_eq!(a, b, max_relative=0.1)
     /// ```
@@ -164,11 +166,12 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::MultiPoint;
     /// use geo_types::point;
     ///
-    /// let a = MultiPoint::new(vec![point![x: 0., y: 0.], point![x: 10., y: 10.]]);
-    /// let b = MultiPoint::new(vec![point![x: 0., y: 0.], point![x: 10.001, y: 10.]]);
+    /// let a = MultiPoint::new(rvec![point![x: 0., y: 0.], point![x: 10., y: 10.]]);
+    /// let b = MultiPoint::new(rvec![point![x: 0., y: 0.], point![x: 10.001, y: 10.]]);
     ///
     /// approx::abs_diff_eq!(a, b, epsilon=0.1);
     /// ```

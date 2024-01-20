@@ -1,11 +1,13 @@
+use core::fmt;
+use core::fmt::Write;
 use crate::{CoordNum, Geometry};
 
-use alloc::vec;
-use alloc::vec::Vec;
 #[cfg(any(feature = "approx", test))]
 use approx::{AbsDiffEq, RelativeEq};
 use core::iter::FromIterator;
 use core::ops::{Index, IndexMut};
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 /// A collection of [`Geometry`](enum.Geometry.html) types.
 ///
@@ -24,10 +26,11 @@ use core::ops::{Index, IndexMut};
 ///
 /// ```
 /// use std::convert::TryFrom;
+/// use abi_stable::rvec;
 /// use geo_types::{Point, point, Geometry, GeometryCollection};
 /// let p = point!(x: 1.0, y: 1.0);
 /// let pe = Geometry::Point(p);
-/// let gc = GeometryCollection::new_from(vec![pe]);
+/// let gc = GeometryCollection::new_from(rvec![pe]);
 /// for geom in gc {
 ///     println!("{:?}", Point::try_from(geom).unwrap().x());
 /// }
@@ -36,10 +39,11 @@ use core::ops::{Index, IndexMut};
 ///
 /// ```
 /// use std::convert::TryFrom;
+/// use abi_stable::rvec;
 /// use geo_types::{Point, point, Geometry, GeometryCollection};
 /// let p = point!(x: 1.0, y: 1.0);
 /// let pe = Geometry::Point(p);
-/// let gc = GeometryCollection::new_from(vec![pe]);
+/// let gc = GeometryCollection::new_from(rvec![pe]);
 /// gc.iter().for_each(|geom| println!("{:?}", geom));
 /// ```
 ///
@@ -47,10 +51,11 @@ use core::ops::{Index, IndexMut};
 ///
 /// ```
 /// use std::convert::TryFrom;
+/// use abi_stable::rvec;
 /// use geo_types::{Point, point, Geometry, GeometryCollection};
 /// let p = point!(x: 1.0, y: 1.0);
 /// let pe = Geometry::Point(p);
-/// let mut gc = GeometryCollection::new_from(vec![pe]);
+/// let mut gc = GeometryCollection::new_from(rvec![pe]);
 /// gc.iter_mut().for_each(|geom| {
 ///    if let Geometry::Point(p) = geom {
 ///        p.set_x(0.2);
@@ -64,22 +69,23 @@ use core::ops::{Index, IndexMut};
 ///
 /// ```
 /// use std::convert::TryFrom;
+/// use abi_stable::rvec;
 /// use geo_types::{Point, point, Geometry, GeometryCollection};
 /// let p = point!(x: 1.0, y: 1.0);
 /// let pe = Geometry::Point(p);
-/// let gc = GeometryCollection::new_from(vec![pe]);
+/// let gc = GeometryCollection::new_from(rvec![pe]);
 /// println!("{:?}", gc[0]);
 /// ```
 ///
 #[derive(Eq, PartialEq, Clone, Debug, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct GeometryCollection<T: CoordNum = f64>(pub Vec<Geometry<T>>);
+pub struct GeometryCollection<T: CoordNum = f64>(pub RVec<Geometry<T>>);
 
 // Implementing Default by hand because T does not have Default restriction
 // todo: consider adding Default as a CoordNum requirement
 impl<T: CoordNum> Default for GeometryCollection<T> {
     fn default() -> Self {
-        Self(Vec::new())
+        Self(RVec::new())
     }
 }
 
@@ -95,7 +101,7 @@ impl<T: CoordNum> GeometryCollection<T> {
     /// DO NOT USE!
     /// This fn will be renamed to `new` in the upcoming version.
     /// This fn is not marked as deprecated because it would require extensive refactoring of the geo code.
-    pub fn new_from(value: Vec<Geometry<T>>) -> Self {
+    pub fn new_from(value: RVec<Geometry<T>>) -> Self {
         Self(value)
     }
 
@@ -112,16 +118,16 @@ impl<T: CoordNum> GeometryCollection<T> {
 
 /// **DO NOT USE!** Deprecated since 0.7.5.
 ///
-/// Use `GeometryCollection::from(vec![geom])` instead.
+/// Use `GeometryCollection::from(rvec![geom])` instead.
 impl<T: CoordNum, IG: Into<Geometry<T>>> From<IG> for GeometryCollection<T> {
     fn from(x: IG) -> Self {
-        Self(vec![x.into()])
+        Self(rvec![x.into()])
     }
 }
 
-impl<T: CoordNum, IG: Into<Geometry<T>>> From<Vec<IG>> for GeometryCollection<T> {
-    fn from(geoms: Vec<IG>) -> Self {
-        let geoms: Vec<Geometry<_>> = geoms.into_iter().map(Into::into).collect();
+impl<T: CoordNum, IG: Into<Geometry<T>>> From<RVec<IG>> for GeometryCollection<T> {
+    fn from(geoms: RVec<IG>) -> Self {
+        let geoms: RVec<Geometry<_>> = geoms.into_iter().map(Into::into).collect();
         Self(geoms)
     }
 }
@@ -148,9 +154,16 @@ impl<T: CoordNum> IndexMut<usize> for GeometryCollection<T> {
 }
 
 // structure helper for consuming iterator
-#[derive(Debug)]
 pub struct IntoIteratorHelper<T: CoordNum> {
-    iter: ::alloc::vec::IntoIter<Geometry<T>>,
+    iter: abi_stable::std_types::vec::IntoIter<Geometry<T>>,
+}
+
+impl<T: CoordNum> fmt::Debug for IntoIteratorHelper<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("IntoIteratorHelper(")?;
+        f.debug_tuple("IntoIter").field(&self.iter.as_slice()).finish()?;
+        f.write_char(')')
+    }
 }
 
 // implement the IntoIterator trait for a consuming iterator. Iteration will
@@ -262,10 +275,11 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{GeometryCollection, point};
     ///
-    /// let a = GeometryCollection::new_from(vec![point![x: 1.0, y: 2.0].into()]);
-    /// let b = GeometryCollection::new_from(vec![point![x: 1.0, y: 2.01].into()]);
+    /// let a = GeometryCollection::new_from(rvec![point![x: 1.0, y: 2.0].into()]);
+    /// let b = GeometryCollection::new_from(rvec![point![x: 1.0, y: 2.01].into()]);
     ///
     /// approx::assert_relative_eq!(a, b, max_relative=0.1);
     /// approx::assert_relative_ne!(a, b, max_relative=0.0001);
@@ -304,10 +318,11 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{GeometryCollection, point};
     ///
-    /// let a = GeometryCollection::new_from(vec![point![x: 0.0, y: 0.0].into()]);
-    /// let b = GeometryCollection::new_from(vec![point![x: 0.0, y: 0.1].into()]);
+    /// let a = GeometryCollection::new_from(rvec![point![x: 0.0, y: 0.0].into()]);
+    /// let b = GeometryCollection::new_from(rvec![point![x: 0.0, y: 0.1].into()]);
     ///
     /// approx::abs_diff_eq!(a, b, epsilon=0.1);
     /// approx::abs_diff_ne!(a, b, epsilon=0.001);
@@ -325,13 +340,13 @@ where
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
+    use abi_stable::rvec;
 
     use crate::{GeometryCollection, Point};
 
     #[test]
     fn from_vec() {
-        let gc = GeometryCollection::from(vec![Point::new(1i32, 2)]);
+        let gc = GeometryCollection::from(rvec![Point::new(1i32, 2)]);
         let p = Point::try_from(gc[0].clone()).unwrap();
         assert_eq!(p.y(), 2);
     }

@@ -55,6 +55,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::*;
     use crate::{line_string, point, polygon, Coord, LineString, Polygon};
 
@@ -117,7 +118,7 @@ mod test {
     }
     #[test]
     fn test_rotate_polygon_holes() {
-        let ls1 = LineString::from(vec![
+        let ls1 = LineString::from(rvec![
             (5.0, 1.0),
             (4.0, 2.0),
             (4.0, 3.0),
@@ -129,9 +130,9 @@ mod test {
             (5.0, 1.0),
         ]);
 
-        let ls2 = LineString::from(vec![(5.0, 1.3), (5.5, 2.0), (6.0, 1.3), (5.0, 1.3)]);
+        let ls2 = LineString::from(rvec![(5.0, 1.3), (5.5, 2.0), (6.0, 1.3), (5.0, 1.3)]);
 
-        let poly1 = Polygon::new(ls1, vec![ls2]);
+        let poly1 = Polygon::new(ls1, rvec![ls2]);
         let rotated = poly1.translate(17.0, 18.0);
         let correct_outside = vec![
             Coord::from((22.0, 19.0)),

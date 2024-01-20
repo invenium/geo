@@ -5,6 +5,8 @@ use crate::{
 use num_traits::Float;
 use rstar::RTreeNum;
 use std::cmp::max;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 const K_MULTIPLIER: f32 = 1.5;
 
@@ -143,13 +145,13 @@ where
 {
     assert!(dataset.size() <= 3);
 
-    let mut coords: Vec<Coord<T>> = dataset.iter().cloned().collect();
+    let mut coords: RVec<Coord<T>> = dataset.iter().cloned().collect();
     if !coords.is_empty() {
         // close the linestring provided it's not empty
         coords.push(coords[0]);
     }
 
-    Polygon::new(LineString::from(coords), vec![])
+    Polygon::new(LineString::from(coords), rvec![])
 }
 
 fn concave_hull_inner<T>(original_dataset: rstar::RTree<Coord<T>>, k: u32) -> Polygon<T>
@@ -168,7 +170,7 @@ where
     let mut dataset = original_dataset.clone();
 
     let first_coord = get_first_coord(&dataset);
-    let mut hull = vec![first_coord];
+    let mut hull = rvec![first_coord];
 
     let mut current_coord = first_coord;
     dataset.remove(&first_coord);
@@ -200,7 +202,7 @@ where
         }
     }
 
-    let poly = Polygon::new(LineString::from(hull), vec![]);
+    let poly = Polygon::new(LineString::from(hull), rvec![]);
 
     if original_dataset
         .iter()
@@ -216,7 +218,7 @@ fn fall_back_hull<T>(dataset: &rstar::RTree<Coord<T>>) -> Polygon<T>
 where
     T: GeoFloat + RTreeNum,
 {
-    let multipoint = MultiPoint::from(dataset.iter().cloned().collect::<Vec<Coord<T>>>());
+    let multipoint = MultiPoint::from(dataset.iter().cloned().collect::<RVec<Coord<T>>>());
     multipoint.convex_hull()
 }
 
@@ -398,7 +400,7 @@ mod tests {
     #[test]
     fn empty_hull() {
         let actual: Polygon<f64> = concave_hull([].iter(), 3);
-        let expected = Polygon::new(LineString::new(vec![]), vec![]);
+        let expected = Polygon::new(LineString::new(rvec![]), rvec![]);
         assert_eq!(actual, expected);
     }
 }

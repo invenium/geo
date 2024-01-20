@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+abi_stable = { version = "0.11.3" }
 approx = ">= 0.4.0, < 0.6.0"
 geo = { path = "../geo" }
 include_dir = { version = "0.7.2", features = ["glob"] }

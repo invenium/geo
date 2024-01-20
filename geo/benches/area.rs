@@ -5,7 +5,7 @@ use geo::Polygon;
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("area", |bencher| {
         let norway = geo_test_fixtures::norway_main::<f32>();
-        let polygon = Polygon::new(norway, vec![]);
+        let polygon = Polygon::new(norway, rvec![]);
 
         bencher.iter(|| {
             criterion::black_box(criterion::black_box(&polygon).signed_area());

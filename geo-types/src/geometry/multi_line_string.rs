@@ -1,10 +1,10 @@
 use crate::{CoordNum, LineString};
 
-use alloc::vec;
-use alloc::vec::Vec;
 #[cfg(any(feature = "approx", test))]
 use approx::{AbsDiffEq, RelativeEq};
 use core::iter::FromIterator;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 /// A collection of
 /// [`LineString`s](line_string/struct.LineString.html). Can
@@ -35,11 +35,11 @@ use core::iter::FromIterator;
 /// of a closed `MultiLineString` is always empty.
 #[derive(Eq, PartialEq, Clone, Debug, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct MultiLineString<T: CoordNum = f64>(pub Vec<LineString<T>>);
+pub struct MultiLineString<T: CoordNum = f64>(pub RVec<LineString<T>>);
 
 impl<T: CoordNum> MultiLineString<T> {
     /// Instantiate Self from the raw content value
-    pub fn new(value: Vec<LineString<T>>) -> Self {
+    pub fn new(value: RVec<LineString<T>>) -> Self {
         Self(value)
     }
 
@@ -49,19 +49,20 @@ impl<T: CoordNum> MultiLineString<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{MultiLineString, LineString, line_string};
     ///
     /// let open_line_string: LineString<f32> = line_string![(x: 0., y: 0.), (x: 5., y: 0.)];
-    /// assert!(!MultiLineString::new(vec![open_line_string.clone()]).is_closed());
+    /// assert!(!MultiLineString::new(rvec![open_line_string.clone()]).is_closed());
     ///
     /// let closed_line_string: LineString<f32> = line_string![(x: 0., y: 0.), (x: 5., y: 0.), (x: 0., y: 0.)];
-    /// assert!(MultiLineString::new(vec![closed_line_string.clone()]).is_closed());
+    /// assert!(MultiLineString::new(rvec![closed_line_string.clone()]).is_closed());
     ///
     /// // MultiLineString is not closed if *any* of it's LineStrings are not closed
-    /// assert!(!MultiLineString::new(vec![open_line_string, closed_line_string]).is_closed());
+    /// assert!(!MultiLineString::new(rvec![open_line_string, closed_line_string]).is_closed());
     ///
     /// // An empty MultiLineString is closed
-    /// assert!(MultiLineString::<f32>::new(vec![]).is_closed());
+    /// assert!(MultiLineString::<f32>::new(rvec![]).is_closed());
     /// ```
     pub fn is_closed(&self) -> bool {
         // Note: Unlike JTS et al, we consider an empty MultiLineString as closed.
@@ -71,7 +72,7 @@ impl<T: CoordNum> MultiLineString<T> {
 
 impl<T: CoordNum, ILS: Into<LineString<T>>> From<ILS> for MultiLineString<T> {
     fn from(ls: ILS) -> Self {
-        Self(vec![ls.into()])
+        Self(rvec![ls.into()])
     }
 }
 
@@ -83,7 +84,7 @@ impl<T: CoordNum, ILS: Into<LineString<T>>> FromIterator<ILS> for MultiLineStrin
 
 impl<T: CoordNum> IntoIterator for MultiLineString<T> {
     type Item = LineString<T>;
-    type IntoIter = ::alloc::vec::IntoIter<LineString<T>>;
+    type IntoIter = abi_stable::std_types::vec::IntoIter<LineString<T>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -133,10 +134,11 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{MultiLineString, line_string};
     ///
-    /// let a = MultiLineString::new(vec![line_string![(x: 0., y: 0.), (x: 10., y: 10.)]]);
-    /// let b = MultiLineString::new(vec![line_string![(x: 0., y: 0.), (x: 10.01, y: 10.)]]);
+    /// let a = MultiLineString::new(rvec![line_string![(x: 0., y: 0.), (x: 10., y: 10.)]]);
+    /// let b = MultiLineString::new(rvec![line_string![(x: 0., y: 0.), (x: 10.01, y: 10.)]]);
     ///
     /// approx::assert_relative_eq!(a, b, max_relative=0.1);
     /// approx::assert_relative_ne!(a, b, max_relative=0.0001);
@@ -175,10 +177,11 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{MultiLineString, line_string};
     ///
-    /// let a = MultiLineString::new(vec![line_string![(x: 0., y: 0.), (x: 10., y: 10.)]]);
-    /// let b = MultiLineString::new(vec![line_string![(x: 0., y: 0.), (x: 10.01, y: 10.)]]);
+    /// let a = MultiLineString::new(rvec![line_string![(x: 0., y: 0.), (x: 10., y: 10.)]]);
+    /// let b = MultiLineString::new(rvec![line_string![(x: 0., y: 0.), (x: 10.01, y: 10.)]]);
     ///
     /// approx::abs_diff_eq!(a, b, epsilon=0.1);
     /// approx::abs_diff_ne!(a, b, epsilon=0.001);
@@ -229,7 +232,7 @@ mod test {
 
     #[test]
     fn test_iter_mut() {
-        let mut multi = MultiLineString::new(vec![
+        let mut multi = MultiLineString::new(rvec![
             line_string![(x: 0, y: 0), (x: 2, y: 0), (x: 1, y: 2), (x:0, y:0)],
             line_string![(x: 10, y: 10), (x: 12, y: 10), (x: 11, y: 12), (x:10, y:10)],
         ]);

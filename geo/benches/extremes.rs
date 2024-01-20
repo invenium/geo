@@ -5,7 +5,7 @@ use geo::Polygon;
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("extremes f32", |bencher| {
         let norway = geo_test_fixtures::norway_main::<f32>();
-        let polygon = Polygon::new(norway, vec![]);
+        let polygon = Polygon::new(norway, rvec![]);
 
         bencher.iter(|| {
             criterion::black_box(criterion::black_box(&polygon).extremes());
@@ -14,7 +14,7 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("extremes f64", |bencher| {
         let norway = geo_test_fixtures::norway_main::<f64>();
-        let polygon = Polygon::new(norway, vec![]);
+        let polygon = Polygon::new(norway, rvec![]);
 
         bencher.iter(|| {
             criterion::black_box(criterion::black_box(&polygon).extremes());

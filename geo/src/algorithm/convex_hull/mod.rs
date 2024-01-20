@@ -1,3 +1,5 @@
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 use crate::geometry::{Coord, LineString, Polygon};
 use crate::kernels::*;
 use crate::GeoNum;
@@ -55,7 +57,7 @@ where
 
     fn convex_hull(&'a self) -> Polygon<T> {
         let mut exterior: Vec<_> = self.exterior_coords_iter().collect();
-        Polygon::new(quick_hull(&mut exterior), vec![])
+        Polygon::new(quick_hull(&mut exterior), rvec![])
     }
 }
 
@@ -77,7 +79,7 @@ where
 
     // Remove repeated points unless collinear points
     // are to be included.
-    let mut ls: Vec<Coord<T>> = points.to_vec();
+    let mut ls: RVec<Coord<T>> = RVec::from(points);
     if !include_on_hull {
         ls.sort_unstable_by(lex_cmp);
         if ls.len() == 3 && T::Ker::orient2d(ls[0], ls[1], ls[2]) == Orientation::Collinear {

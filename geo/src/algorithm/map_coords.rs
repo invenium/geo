@@ -24,6 +24,7 @@
 //! assert_relative_eq!(3497301.5918027186, usa_ft.y(), epsilon = 1e-6);
 //! ```
 
+use abi_stable::std_types::RVec;
 pub(crate) use crate::geometry::*;
 pub(crate) use crate::CoordNum;
 
@@ -264,7 +265,7 @@ impl<T: CoordNum, NT: CoordNum> MapCoords<T, NT> for LineString<T> {
         LineString::from(
             self.points()
                 .map(|p| p.map_coords(func))
-                .collect::<Vec<_>>(),
+                .collect::<RVec<_>>(),
         )
     }
 
@@ -275,7 +276,7 @@ impl<T: CoordNum, NT: CoordNum> MapCoords<T, NT> for LineString<T> {
         Ok(LineString::from(
             self.points()
                 .map(|p| p.try_map_coords(func))
-                .collect::<Result<Vec<_>, E>>()?,
+                .collect::<Result<RVec<_>, E>>()?,
         ))
     }
 }
@@ -324,7 +325,7 @@ impl<T: CoordNum, NT: CoordNum> MapCoords<T, NT> for Polygon<T> {
             self.interiors()
                 .iter()
                 .map(|l| l.try_map_coords(func))
-                .collect::<Result<Vec<_>, E>>()?,
+                .collect::<Result<RVec<_>, E>>()?,
         ))
     }
 }
@@ -388,7 +389,7 @@ impl<T: CoordNum, NT: CoordNum> MapCoords<T, NT> for MultiPoint<T> {
             self.0
                 .iter()
                 .map(|p| p.try_map_coords(func))
-                .collect::<Result<Vec<_>, E>>()?,
+                .collect::<Result<RVec<_>, E>>()?,
         ))
     }
 }
@@ -430,7 +431,7 @@ impl<T: CoordNum, NT: CoordNum> MapCoords<T, NT> for MultiLineString<T> {
             self.0
                 .iter()
                 .map(|l| l.try_map_coords(func))
-                .collect::<Result<Vec<_>, E>>()?,
+                .collect::<Result<RVec<_>, E>>()?,
         ))
     }
 }
@@ -472,7 +473,7 @@ impl<T: CoordNum, NT: CoordNum> MapCoords<T, NT> for MultiPolygon<T> {
             self.0
                 .iter()
                 .map(|p| p.try_map_coords(func))
-                .collect::<Result<Vec<_>, E>>()?,
+                .collect::<Result<RVec<_>, E>>()?,
         ))
     }
 }
@@ -594,7 +595,7 @@ impl<T: CoordNum, NT: CoordNum> MapCoords<T, NT> for GeometryCollection<T> {
             self.0
                 .iter()
                 .map(|g| g.try_map_coords(func))
-                .collect::<Result<Vec<_>, E>>()?,
+                .collect::<Result<RVec<_>, E>>()?,
         ))
     }
 }
@@ -692,6 +693,7 @@ impl<T: CoordNum> MapCoordsInPlace<T> for Triangle<T> {
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::{MapCoords, MapCoordsInPlace};
     use crate::{
         coord, polygon, Coord, Geometry, GeometryCollection, Line, LineString, MultiLineString,
@@ -793,7 +795,7 @@ mod test {
 
     #[test]
     fn linestring() {
-        let line1: LineString<f32> = LineString::from(vec![(0., 0.), (1., 2.)]);
+        let line1: LineString<f32> = LineString::from(rvec![(0., 0.), (1., 2.)]);
         let line2 = line1.map_coords(|Coord { x, y }| (x + 10., y - 100.).into());
         assert_relative_eq!(line2.0[0], Coord::from((10., -100.)), epsilon = 1e-6);
         assert_relative_eq!(line2.0[1], Coord::from((11., -98.)), epsilon = 1e-6);
@@ -801,8 +803,8 @@ mod test {
 
     #[test]
     fn polygon() {
-        let exterior = LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]);
-        let interiors = vec![LineString::from(vec![
+        let exterior = LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]);
+        let interiors = rvec![LineString::from(rvec![
             (0.1, 0.1),
             (0.9, 0.9),
             (0.9, 0.1),
@@ -813,8 +815,8 @@ mod test {
         let p2 = p.map_coords(|Coord { x, y }| (x + 10., y - 100.).into());
 
         let exterior2 =
-            LineString::from(vec![(10., -100.), (11., -99.), (11., -100.), (10., -100.)]);
-        let interiors2 = vec![LineString::from(vec![
+            LineString::from(rvec![(10., -100.), (11., -99.), (11., -100.), (10., -100.)]);
+        let interiors2 = rvec![LineString::from(rvec![
             (10.1, -99.9),
             (10.9, -99.1),
             (10.9, -99.9),
@@ -829,25 +831,25 @@ mod test {
     fn multipoint() {
         let p1 = Point::new(10., 10.);
         let p2 = Point::new(0., -100.);
-        let mp = MultiPoint::new(vec![p1, p2]);
+        let mp = MultiPoint::new(rvec![p1, p2]);
 
         assert_eq!(
             mp.map_coords(|Coord { x, y }| (x + 10., y + 100.).into()),
-            MultiPoint::new(vec![Point::new(20., 110.), Point::new(10., 0.)])
+            MultiPoint::new(rvec![Point::new(20., 110.), Point::new(10., 0.)])
         );
     }
 
     #[test]
     fn multilinestring() {
-        let line1: LineString<f32> = LineString::from(vec![(0., 0.), (1., 2.)]);
-        let line2: LineString<f32> = LineString::from(vec![(-1., 0.), (0., 0.), (1., 2.)]);
-        let mline = MultiLineString::new(vec![line1, line2]);
+        let line1: LineString<f32> = LineString::from(rvec![(0., 0.), (1., 2.)]);
+        let line2: LineString<f32> = LineString::from(rvec![(-1., 0.), (0., 0.), (1., 2.)]);
+        let mline = MultiLineString::new(rvec![line1, line2]);
         let mline2 = mline.map_coords(|Coord { x, y }| (x + 10., y - 100.).into());
         assert_relative_eq!(
             mline2,
-            MultiLineString::new(vec![
-                LineString::from(vec![(10., -100.), (11., -98.)]),
-                LineString::from(vec![(9., -100.), (10., -100.), (11., -98.)]),
+            MultiLineString::new(rvec![
+                LineString::from(rvec![(10., -100.), (11., -98.)]),
+                LineString::from(rvec![(9., -100.), (10., -100.), (11., -98.)]),
             ]),
             epsilon = 1e-6
         );
@@ -881,7 +883,7 @@ mod test {
             ],
         ];
 
-        let mp = MultiPolygon::new(vec![poly1, poly2]);
+        let mp = MultiPolygon::new(rvec![poly1, poly2]);
         let mp2 = mp.map_coords(|Coord { x, y }| (x * 2., y + 100.).into());
         assert_eq!(mp2.0.len(), 2);
         assert_relative_eq!(
@@ -920,15 +922,15 @@ mod test {
     #[test]
     fn geometrycollection() {
         let p1 = Geometry::Point(Point::new(10., 10.));
-        let line1 = Geometry::LineString(LineString::from(vec![(0., 0.), (1., 2.)]));
+        let line1 = Geometry::LineString(LineString::from(rvec![(0., 0.), (1., 2.)]));
 
-        let gc = GeometryCollection::new_from(vec![p1, line1]);
+        let gc = GeometryCollection::new_from(rvec![p1, line1]);
 
         assert_eq!(
             gc.map_coords(|Coord { x, y }| (x + 10., y + 100.).into()),
-            GeometryCollection::new_from(vec![
+            GeometryCollection::new_from(rvec![
                 Geometry::Point(Point::new(20., 110.)),
-                Geometry::LineString(LineString::from(vec![(10., 100.), (11., 102.)])),
+                Geometry::LineString(LineString::from(rvec![(10., 100.), (11., 102.)])),
             ])
         );
     }
@@ -970,14 +972,14 @@ mod test {
             }
         };
         // this should produce an error
-        let bad_ls: LineString<_> = vec![
+        let bad_ls: LineString<_> = rvec![
             Point::new(1.0, 1.0),
             Point::new(2.0, 2.0),
             Point::new(3.0, 3.0),
         ]
         .into();
         // this should be fine
-        let good_ls: LineString<_> = vec![
+        let good_ls: LineString<_> = rvec![
             Point::new(1.0, 1.0),
             Point::new(2.1, 2.0),
             Point::new(3.0, 3.0),
@@ -989,7 +991,7 @@ mod test {
         assert!(good.is_ok());
         assert_relative_eq!(
             good.unwrap(),
-            vec![
+            rvec![
                 Point::new(2., 101.),
                 Point::new(4.2, 102.),
                 Point::new(6.0, 103.),

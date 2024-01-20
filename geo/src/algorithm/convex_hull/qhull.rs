@@ -1,3 +1,5 @@
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 use super::{swap_remove_to_first, trivial_hull};
 use crate::kernels::{HasKernel, Kernel, Orientation};
 use crate::utils::partition_slice;
@@ -26,7 +28,7 @@ where
     if points.len() < 4 {
         return trivial_hull(points, false);
     }
-    let mut hull = vec![];
+    let mut hull = rvec![];
 
     use crate::utils::least_and_greatest_index;
     let (min, max) = {
@@ -63,7 +65,7 @@ where
 }
 
 // recursively calculate the convex hull of a subset of points
-fn hull_set<T>(p_a: Coord<T>, p_b: Coord<T>, mut set: &mut [Coord<T>], hull: &mut Vec<Coord<T>>)
+fn hull_set<T>(p_a: Coord<T>, p_b: Coord<T>, mut set: &mut [Coord<T>], hull: &mut RVec<Coord<T>>)
 where
     T: GeoNum,
 {

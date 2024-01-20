@@ -332,6 +332,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
 #[cfg(test)]
 mod tests {
     use std::cmp::Ordering;
+    use abi_stable::rvec;
 
     use geo_types::{Coord, LineString};
     use wkt::ToWkt;
@@ -383,8 +384,8 @@ mod tests {
             "(8-7) {isect:?} (14-13)",
             isect = check_isection([pt_8, pt_7, pt_14, pt_13]),
         );
-        let l87 = LineString::new(vec![pt_8, pt_16, pt_7]);
-        let lo = LineString::new(vec![pt_14, pt_16, pt_13]);
+        let l87 = LineString::new(rvec![pt_8, pt_16, pt_7]);
+        let lo = LineString::new(rvec![pt_14, pt_16, pt_13]);
         eprintln!("l1: {}", l87.to_wkt());
         eprintln!("lo: {}", lo.to_wkt());
 

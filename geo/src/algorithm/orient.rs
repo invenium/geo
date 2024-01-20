@@ -122,23 +122,24 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::*;
     use crate::{LineString, Polygon};
     #[test]
     fn test_polygon_orientation() {
         // a diamond shape, oriented clockwise outside
-        let points_ext = vec![(1.0, 0.0), (0.0, 1.0), (1.0, 2.0), (2.0, 1.0), (1.0, 0.0)];
+        let points_ext = rvec![(1.0, 0.0), (0.0, 1.0), (1.0, 2.0), (2.0, 1.0), (1.0, 0.0)];
         // counter-clockwise interior
-        let points_int = vec![(1.0, 0.5), (1.5, 1.0), (1.0, 1.5), (0.5, 1.0), (1.0, 0.5)];
+        let points_int = rvec![(1.0, 0.5), (1.5, 1.0), (1.0, 1.5), (0.5, 1.0), (1.0, 0.5)];
         let poly1 = Polygon::new(
             LineString::from(points_ext),
-            vec![LineString::from(points_int)],
+            rvec![LineString::from(points_int)],
         );
         // a diamond shape, oriented counter-clockwise outside,
-        let oriented_ext = vec![(1.0, 0.0), (2.0, 1.0), (1.0, 2.0), (0.0, 1.0), (1.0, 0.0)];
+        let oriented_ext = rvec![(1.0, 0.0), (2.0, 1.0), (1.0, 2.0), (0.0, 1.0), (1.0, 0.0)];
         let oriented_ext_ls = LineString::from(oriented_ext);
         // clockwise interior
-        let oriented_int_raw = vec![(1.0, 0.5), (0.5, 1.0), (1.0, 1.5), (1.5, 1.0), (1.0, 0.5)];
+        let oriented_int_raw = rvec![(1.0, 0.5), (0.5, 1.0), (1.0, 1.5), (1.5, 1.0), (1.0, 0.5)];
         let oriented_int_ls = LineString::from(oriented_int_raw);
         // build corrected Polygon
         let oriented = orient(&poly1, Direction::Default);

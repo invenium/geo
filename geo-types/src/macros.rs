@@ -123,7 +123,7 @@ macro_rules! coord {
 /// [`LineString`]: ./line_string/struct.LineString.html
 #[macro_export]
 macro_rules! line_string {
-    () => { $crate::LineString::new($crate::_alloc::vec![]) };
+    () => { $crate::LineString::new($crate::_alloc::rvec![]) };
     (
         $(( $($tag:tt : $val:expr),* $(,)? )),*
         $(,)?
@@ -139,7 +139,7 @@ macro_rules! line_string {
         $(,)?
     ) => {
         $crate::LineString::new(
-            $crate::_alloc::vec![
+            $crate::_alloc::rvec![
                 $($coord),*
             ]
         )
@@ -214,7 +214,7 @@ macro_rules! line_string {
 /// [`Polygon`]: ./struct.Polygon.html
 #[macro_export]
 macro_rules! polygon {
-    () => { $crate::Polygon::new($crate::line_string![], $crate::_alloc::vec![]) };
+    () => { $crate::Polygon::new($crate::line_string![], $crate::_alloc::rvec![]) };
     (
         exterior: [
             $(( $($exterior_tag:tt : $exterior_val:expr),* $(,)? )),*
@@ -260,7 +260,7 @@ macro_rules! polygon {
             $crate::line_string![
                 $($exterior_coord), *
             ],
-            $crate::_alloc::vec![
+            $crate::_alloc::rvec![
                 $(
                     $crate::line_string![$($interior_coord),*]
                 ), *
@@ -281,7 +281,7 @@ macro_rules! polygon {
     ) => {
         $crate::Polygon::new(
             $crate::line_string![$($coord,)*],
-            $crate::_alloc::vec![],
+            $crate::_alloc::rvec![],
         )
     };
 }

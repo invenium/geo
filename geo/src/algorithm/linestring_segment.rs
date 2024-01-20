@@ -1,3 +1,4 @@
+use abi_stable::std_types::RVec;
 use crate::line_interpolate_point::LineInterpolatePoint;
 use crate::{Coord, Densify, EuclideanLength, LineString, LinesIter, MultiLineString};
 
@@ -8,21 +9,22 @@ use crate::{Coord, Densify, EuclideanLength, LineString, LinesIter, MultiLineStr
 ///
 /// # Examples
 /// ```
+/// use abi_stable::rvec;
 /// use geo::{LineString, MultiLineString, LineStringSegmentize, Coord};
 /// // Create a simple line string
-/// let lns: LineString<f64> = vec![[0.0, 0.0], [1.0, 2.0], [3.0, 6.0]].into();
+/// let lns: LineString<f64> = rvec![[0.0, 0.0], [1.0, 2.0], [3.0, 6.0]].into();
 /// // Segment it into 6 LineStrings inside of a MultiLineString
 /// let segmentized = lns.line_segmentize(6).unwrap();
 ///
 /// // Recreate the MultiLineString from scratch
 /// // this is the inner vector used to create the MultiLineString
-/// let all_lines = vec![
-///     LineString::new(vec![Coord { x: 0.0, y: 0.0 }, Coord { x: 0.5, y: 1.0 }]),
-///     LineString::new(vec![Coord { x: 0.5, y: 1.0 }, Coord { x: 1.0, y: 2.0 }]),
-///     LineString::new(vec![Coord { x: 1.0, y: 2.0 }, Coord { x: 1.5, y: 3.0 }]),
-///     LineString::new(vec![Coord { x: 1.5, y: 3.0 }, Coord { x: 2.0, y: 4.0 }]),
-///     LineString::new(vec![Coord { x: 2.0, y: 4.0 }, Coord { x: 2.5, y: 5.0 }]),
-///     LineString::new(vec![Coord { x: 2.5, y: 5.0 }, Coord { x: 3.0, y: 6.0 }])
+/// let all_lines = rvec![
+///     LineString::new(rvec![Coord { x: 0.0, y: 0.0 }, Coord { x: 0.5, y: 1.0 }]),
+///     LineString::new(rvec![Coord { x: 0.5, y: 1.0 }, Coord { x: 1.0, y: 2.0 }]),
+///     LineString::new(rvec![Coord { x: 1.0, y: 2.0 }, Coord { x: 1.5, y: 3.0 }]),
+///     LineString::new(rvec![Coord { x: 1.5, y: 3.0 }, Coord { x: 2.0, y: 4.0 }]),
+///     LineString::new(rvec![Coord { x: 2.0, y: 4.0 }, Coord { x: 2.5, y: 5.0 }]),
+///     LineString::new(rvec![Coord { x: 2.5, y: 5.0 }, Coord { x: 3.0, y: 6.0 }])
 ///     ];
 ///
 /// // Create the MultiLineString
@@ -47,7 +49,7 @@ impl LineStringSegmentize for LineString {
 
         // Vec to allocate the  new LineString segments Coord Vec
         // will be iterated over at end to create new vecs
-        let mut res_coords: Vec<Vec<Coord>> = Vec::with_capacity(n);
+        let mut res_coords: RVec<RVec<Coord>> = RVec::with_capacity(n);
 
         // calculate total length to track cumulative against
         let total_length = self.euclidean_length().abs();
@@ -72,7 +74,7 @@ impl LineStringSegmentize for LineString {
             let linestrings = densified
                 .lines()
                 .map(LineString::from)
-                .collect::<Vec<LineString>>();
+                .collect::<RVec<LineString>>();
 
             return Some(MultiLineString::new(linestrings));
         };
@@ -82,7 +84,7 @@ impl LineStringSegmentize for LineString {
 
         let lns = densified.lines_iter();
         // instantiate the first Vec<Coord>
-        let mut ln_vec: Vec<Coord> = Vec::new();
+        let mut ln_vec: RVec<Coord> = RVec::new();
 
         // iterate through each line segment in the LineString
         for (i, segment) in lns.enumerate() {
@@ -113,7 +115,7 @@ impl LineStringSegmentize for LineString {
                 let to_push = ln_vec.drain(..);
 
                 // now collect & push this vector into the results vector
-                res_coords.push(to_push.collect::<Vec<Coord>>());
+                res_coords.push(to_push.collect::<RVec<Coord>>());
 
                 // now add the last endpoint as the first coord
                 // and the endpoint of the linesegment as well only
@@ -137,7 +139,7 @@ impl LineStringSegmentize for LineString {
         let res_lines = res_coords
             .into_iter()
             .map(LineString::new)
-            .collect::<Vec<LineString>>();
+            .collect::<RVec<LineString>>();
 
         Some(MultiLineString::new(res_lines))
     }
@@ -145,6 +147,7 @@ impl LineStringSegmentize for LineString {
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use approx::RelativeEq;
 
     use super::*;
@@ -156,7 +159,7 @@ mod test {
         // https://github.com/georust/geo/issues/1075
         // https://github.com/JosiahParry/rsgeo/issues/28
 
-        let linestring: LineString = vec![
+        let linestring: LineString = rvec![
             [324957.69921197, 673670.123131518],
             [324957.873557727, 673680.139281405],
             [324959.863123514, 673686.784106964],
@@ -179,7 +182,7 @@ mod test {
 
     #[test]
     fn long_end_segment() {
-        let linestring: LineString = vec![
+        let linestring: LineString = rvec![
             [325581.792390628, 674398.495901267],
             [325585.576868499, 674400.657039341],
             [325589.966469742, 674401.694493658],
@@ -201,7 +204,7 @@ mod test {
 
     #[test]
     fn two_coords() {
-        let linestring: LineString = vec![[0.0, 0.0], [0.0, 1.0]].into();
+        let linestring: LineString = rvec![[0.0, 0.0], [0.0, 1.0]].into();
 
         let segments = linestring.line_segmentize(5).unwrap();
         assert_eq!(segments.0.len(), 5);
@@ -214,7 +217,7 @@ mod test {
 
     #[test]
     fn long_middle_segments() {
-        let linestring: LineString = vec![
+        let linestring: LineString = rvec![
             [325403.816883668, 673966.295402012],
             [325410.280933752, 673942.805501254],
             [325410.280933752, 673942.805501254],
@@ -253,21 +256,21 @@ mod test {
     #[test]
     // that 0 returns None and that usize::MAX returns None
     fn n_is_zero() {
-        let linestring: LineString = vec![[-1.0, 0.0], [0.5, 1.0], [1.0, 2.0]].into();
+        let linestring: LineString = rvec![[-1.0, 0.0], [0.5, 1.0], [1.0, 2.0]].into();
         let segments = linestring.line_segmentize(0);
         assert!(segments.is_none())
     }
 
     #[test]
     fn n_is_max() {
-        let linestring: LineString = vec![[-1.0, 0.0], [0.5, 1.0], [1.0, 2.0]].into();
+        let linestring: LineString = rvec![[-1.0, 0.0], [0.5, 1.0], [1.0, 2.0]].into();
         let segments = linestring.line_segmentize(usize::MAX);
         assert!(segments.is_none())
     }
 
     #[test]
     fn n_greater_than_lines() {
-        let linestring: LineString = vec![[-1.0, 0.0], [0.5, 1.0], [1.0, 2.0]].into();
+        let linestring: LineString = rvec![[-1.0, 0.0], [0.5, 1.0], [1.0, 2.0]].into();
         let segments = linestring.line_segmentize(5).unwrap();
 
         // assert that there are n linestring segments
@@ -289,7 +292,7 @@ mod test {
     #[test]
     // test the cumulative length is the same
     fn cumul_length() {
-        let linestring: LineString = vec![[0.0, 0.0], [1.0, 1.0], [1.0, 2.0], [3.0, 3.0]].into();
+        let linestring: LineString = rvec![[0.0, 0.0], [1.0, 1.0], [1.0, 2.0], [3.0, 3.0]].into();
         let segments = linestring.line_segmentize(2).unwrap();
 
         assert_relative_eq!(
@@ -301,7 +304,7 @@ mod test {
 
     #[test]
     fn n_elems() {
-        let linestring: LineString = vec![[0.0, 0.0], [1.0, 1.0], [1.0, 2.0], [3.0, 3.0]].into();
+        let linestring: LineString = rvec![[0.0, 0.0], [1.0, 1.0], [1.0, 2.0], [3.0, 3.0]].into();
         let segments = linestring.line_segmentize(2).unwrap();
         assert_eq!(segments.0.len(), 2)
     }

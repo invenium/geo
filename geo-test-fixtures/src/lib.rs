@@ -1,4 +1,5 @@
 use std::{fs, iter::FromIterator, path::PathBuf, str::FromStr};
+use abi_stable::std_types::RVec;
 
 use geo_types::{LineString, MultiPolygon, Point, Polygon};
 use wkt::{Geometry, Wkt, WktFloat};
@@ -178,7 +179,7 @@ where
     T: WktFloat + Default + FromStr,
 {
     let exterior: LineString<T> = wkt_line_string_to_geo(&polygon.0[0]);
-    let interiors: Vec<LineString<T>> = polygon.0[1..].iter().map(wkt_line_string_to_geo).collect();
+    let interiors: RVec<LineString<T>> = polygon.0[1..].iter().map(wkt_line_string_to_geo).collect();
 
     Polygon::new(exterior, interiors)
 }
@@ -187,7 +188,7 @@ fn wkt_multi_polygon_to_geo<T>(multi_polygon: &wkt::types::MultiPolygon<T>) -> M
 where
     T: WktFloat + Default + FromStr,
 {
-    let polygons: Vec<Polygon<T>> = multi_polygon.0.iter().map(wkt_polygon_to_geo).collect();
+    let polygons: RVec<Polygon<T>> = multi_polygon.0.iter().map(wkt_polygon_to_geo).collect();
     MultiPolygon(polygons)
 }
 

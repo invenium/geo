@@ -13,6 +13,7 @@ use crate::{
     *,
 };
 use std::{cell::Cell, mem::replace};
+use abi_stable::rvec;
 
 /// Construct a monotone subdivision (along the X-axis) of an iterator of polygons.
 ///
@@ -340,8 +341,8 @@ impl<T: GeoNum> Chain<T> {
         debug!("\tprev = {:?}", SweepPoint::from(prev));
         self.0 .0.push(pt);
 
-        let old_chain = Chain(replace(&mut self.0 .0, vec![prev, top]).into());
-        let new_chain = Chain(vec![prev, pt].into());
+        let old_chain = Chain(replace(&mut self.0 .0, rvec![prev, top]).into());
+        let new_chain = Chain(rvec![prev, pt].into());
 
         let lp1 = LineOrPoint::from((prev.into(), top.into()));
         let lp2 = LineOrPoint::from((prev.into(), pt.into()));
