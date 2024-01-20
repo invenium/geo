@@ -11,14 +11,14 @@ fn criterion_benchmark(c: &mut Criterion) {
             let points = points[0..50].to_vec();
             let mut exterior = LineString::<f32>::from(points);
             exterior.close();
-            Polygon::new(exterior, vec![])
+            Polygon::new(exterior, rvec![])
         };
 
         let polygon = {
             let points = points[40..90].to_vec();
             let mut exterior = LineString::<f32>::from(points);
             exterior.close();
-            Polygon::new(exterior, vec![])
+            Polygon::new(exterior, rvec![])
         };
 
         bencher.iter(|| {
@@ -60,8 +60,8 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     c.bench_function("disjoint polygons", |bencher| {
-        let norway = Polygon::new(geo_test_fixtures::norway_main::<f64>(), vec![]);
-        let louisiana = Polygon::new(geo_test_fixtures::louisiana::<f64>(), vec![]);
+        let norway = Polygon::new(geo_test_fixtures::norway_main::<f64>(), rvec![]);
+        let louisiana = Polygon::new(geo_test_fixtures::louisiana::<f64>(), rvec![]);
 
         bencher.iter(|| {
             criterion::black_box(norway.relate(&louisiana));
@@ -69,7 +69,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     c.bench_function("large rotated polygons", |bencher| {
-        let norway = Polygon::new(geo_test_fixtures::norway_main::<f64>(), vec![]);
+        let norway = Polygon::new(geo_test_fixtures::norway_main::<f64>(), rvec![]);
         let rotated_norway = norway.rotate_around_center(20.0);
 
         bencher.iter(|| {
@@ -78,7 +78,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     c.bench_function("offset polygons", |bencher| {
-        let norway = Polygon::new(geo_test_fixtures::norway_main::<f64>(), vec![]);
+        let norway = Polygon::new(geo_test_fixtures::norway_main::<f64>(), rvec![]);
         let translated_norway = norway.translate(10.0, 10.0);
 
         bencher.iter(|| {

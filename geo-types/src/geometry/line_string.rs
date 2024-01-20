@@ -2,10 +2,10 @@
 use approx::{AbsDiffEq, RelativeEq};
 
 use crate::{Coord, CoordNum, Line, Point, Triangle};
-use alloc::vec;
-use alloc::vec::Vec;
 use core::iter::FromIterator;
 use core::ops::{Index, IndexMut};
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 /// An ordered collection of two or more [`Coord`]s, representing a
 /// path between locations.
@@ -35,9 +35,10 @@ use core::ops::{Index, IndexMut};
 /// Create a [`LineString`] by calling it directly:
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::{coord, LineString};
 ///
-/// let line_string = LineString::new(vec![
+/// let line_string = LineString::new(rvec![
 ///     coord! { x: 0., y: 0. },
 ///     coord! { x: 10., y: 0. },
 /// ]);
@@ -57,24 +58,27 @@ use core::ops::{Index, IndexMut};
 /// By converting from a [`Vec`] of coordinate-like things:
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::LineString;
 ///
-/// let line_string: LineString<f32> = vec![(0., 0.), (10., 0.)].into();
+/// let line_string: LineString<f32> = rvec![(0., 0.), (10., 0.)].into();
 /// ```
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::LineString;
 ///
-/// let line_string: LineString = vec![[0., 0.], [10., 0.]].into();
+/// let line_string: LineString = rvec![[0., 0.], [10., 0.]].into();
 /// ```
 //
 /// Or by `collect`ing from a [`Coord`] iterator
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::{coord, LineString};
 ///
 /// let mut coords_iter =
-///     vec![coord! { x: 0., y: 0. }, coord! { x: 10., y: 0. }].into_iter();
+///     rvec![coord! { x: 0., y: 0. }, coord! { x: 10., y: 0. }].into_iter();
 ///
 /// let line_string: LineString<f32> = coords_iter.collect();
 /// ```
@@ -83,9 +87,10 @@ use core::ops::{Index, IndexMut};
 /// [`LineString`] provides five iterators: [`coords`](LineString::coords), [`coords_mut`](LineString::coords_mut), [`points`](LineString::points), [`lines`](LineString::lines), and [`triangles`](LineString::triangles):
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::{coord, LineString};
 ///
-/// let line_string = LineString::new(vec![
+/// let line_string = LineString::new(rvec![
 ///     coord! { x: 0., y: 0. },
 ///     coord! { x: 10., y: 0. },
 /// ]);
@@ -100,9 +105,10 @@ use core::ops::{Index, IndexMut};
 /// Note that its [`IntoIterator`] impl yields [`Coord`]s when looping:
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::{coord, LineString};
 ///
-/// let line_string = LineString::new(vec![
+/// let line_string = LineString::new(rvec![
 ///     coord! { x: 0., y: 0. },
 ///     coord! { x: 10., y: 0. },
 /// ]);
@@ -120,9 +126,10 @@ use core::ops::{Index, IndexMut};
 ///
 /// You can decompose a [`LineString`] into a [`Vec`] of [`Coord`]s or [`Point`]s:
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::{coord, LineString, Point};
 ///
-/// let line_string = LineString::new(vec![
+/// let line_string = LineString::new(rvec![
 ///     coord! { x: 0., y: 0. },
 ///     coord! { x: 10., y: 0. },
 /// ]);
@@ -134,7 +141,7 @@ use core::ops::{Index, IndexMut};
 
 #[derive(Eq, PartialEq, Clone, Debug, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct LineString<T: CoordNum = f64>(pub Vec<Coord<T>>);
+pub struct LineString<T: CoordNum = f64>(pub RVec<Coord<T>>);
 
 /// A [`Point`] iterator returned by the `points` method
 #[derive(Debug)]
@@ -194,7 +201,7 @@ impl<'a, T: CoordNum> DoubleEndedIterator for CoordinatesIter<'a, T> {
 
 impl<T: CoordNum> LineString<T> {
     /// Instantiate Self from the raw content value
-    pub fn new(value: Vec<Coord<T>>) -> Self {
+    pub fn new(value: RVec<Coord<T>>) -> Self {
         Self(value)
     }
 
@@ -220,12 +227,12 @@ impl<T: CoordNum> LineString<T> {
     }
 
     /// Return the coordinates of a [`LineString`] as a [`Vec`] of [`Point`]s
-    pub fn into_points(self) -> Vec<Point<T>> {
+    pub fn into_points(self) -> RVec<Point<T>> {
         self.0.into_iter().map(Point::from).collect()
     }
 
     /// Return the coordinates of a [`LineString`] as a [`Vec`] of [`Coord`]s
-    pub fn into_inner(self) -> Vec<Coord<T>> {
+    pub fn into_inner(self) -> RVec<Coord<T>> {
         self.0
     }
 
@@ -235,9 +242,10 @@ impl<T: CoordNum> LineString<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, Line, LineString};
     ///
-    /// let mut coords = vec![(0., 0.), (5., 0.), (7., 9.)];
+    /// let mut coords = rvec![(0., 0.), (5., 0.), (7., 9.)];
     /// let line_string: LineString<f32> = coords.into_iter().collect();
     ///
     /// let mut lines = line_string.lines();
@@ -294,9 +302,10 @@ impl<T: CoordNum> LineString<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::LineString;
     ///
-    /// let mut coords = vec![(0., 0.), (5., 0.), (7., 9.)];
+    /// let mut coords = rvec![(0., 0.), (5., 0.), (7., 9.)];
     /// let line_string: LineString<f32> = coords.into_iter().collect();
     ///
     /// # #[allow(deprecated)]
@@ -316,9 +325,10 @@ impl<T: CoordNum> LineString<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::LineString;
     ///
-    /// let mut coords = vec![(0., 0.), (5., 0.), (0., 0.)];
+    /// let mut coords = rvec![(0., 0.), (5., 0.), (0., 0.)];
     /// let line_string: LineString<f32> = coords.into_iter().collect();
     /// assert!(line_string.is_closed());
     /// ```
@@ -338,8 +348,8 @@ impl<T: CoordNum> LineString<T> {
 }
 
 /// Turn a [`Vec`] of [`Point`]-like objects into a [`LineString`].
-impl<T: CoordNum, IC: Into<Coord<T>>> From<Vec<IC>> for LineString<T> {
-    fn from(v: Vec<IC>) -> Self {
+impl<T: CoordNum, IC: Into<Coord<T>>> From<RVec<IC>> for LineString<T> {
+    fn from(v: RVec<IC>) -> Self {
         Self(v.into_iter().map(|c| c.into()).collect())
     }
 }
@@ -352,7 +362,7 @@ impl<T: CoordNum> From<Line<T>> for LineString<T> {
 
 impl<T: CoordNum> From<&Line<T>> for LineString<T> {
     fn from(line: &Line<T>) -> Self {
-        Self(vec![line.start, line.end])
+        Self(rvec![line.start, line.end])
     }
 }
 
@@ -366,7 +376,7 @@ impl<T: CoordNum, IC: Into<Coord<T>>> FromIterator<IC> for LineString<T> {
 /// Iterate over all the [`Coord`]s in this [`LineString`].
 impl<T: CoordNum> IntoIterator for LineString<T> {
     type Item = Coord<T>;
-    type IntoIter = ::alloc::vec::IntoIter<Coord<T>>;
+    type IntoIter = abi_stable::std_types::vec::IntoIter<Coord<T>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -421,12 +431,13 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::LineString;
     ///
-    /// let mut coords_a = vec![(0., 0.), (5., 0.), (7., 9.)];
+    /// let mut coords_a = rvec![(0., 0.), (5., 0.), (7., 9.)];
     /// let a: LineString<f32> = coords_a.into_iter().collect();
     ///
-    /// let mut coords_b = vec![(0., 0.), (5., 0.), (7.001, 9.)];
+    /// let mut coords_b = rvec![(0., 0.), (5., 0.), (7.001, 9.)];
     /// let b: LineString<f32> = coords_b.into_iter().collect();
     ///
     /// approx::assert_relative_eq!(a, b, max_relative=0.1)
@@ -467,12 +478,13 @@ impl<T: AbsDiffEq<Epsilon = T> + CoordNum> AbsDiffEq for LineString<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::LineString;
     ///
-    /// let mut coords_a = vec![(0., 0.), (5., 0.), (7., 9.)];
+    /// let mut coords_a = rvec![(0., 0.), (5., 0.), (7., 9.)];
     /// let a: LineString<f32> = coords_a.into_iter().collect();
     ///
-    /// let mut coords_b = vec![(0., 0.), (5., 0.), (7.001, 9.)];
+    /// let mut coords_b = rvec![(0., 0.), (5., 0.), (7.001, 9.)];
     /// let b: LineString<f32> = coords_b.into_iter().collect();
     ///
     /// approx::assert_relative_eq!(a, b, epsilon=0.1)
@@ -554,7 +566,7 @@ mod test {
     fn test_exact_size() {
         // see https://github.com/georust/geo/issues/762
         let first = coord! { x: 0., y: 0. };
-        let ls = LineString::new(vec![first, coord! { x: 10., y: 0. }]);
+        let ls = LineString::new(rvec![first, coord! { x: 10., y: 0. }]);
 
         // reference to force the `impl IntoIterator for &LineString` impl, giving a `CoordinatesIter`
         for c in (&ls).into_iter().rev().skip(1).rev() {
@@ -569,26 +581,26 @@ mod test {
     fn test_abs_diff_eq() {
         let delta = 1e-6;
 
-        let coords = vec![(0., 0.), (5., 0.), (10., 10.)];
+        let coords = rvec![(0., 0.), (5., 0.), (10., 10.)];
         let ls: LineString<f32> = coords.into_iter().collect();
 
-        let coords_x = vec![(0., 0.), (5. + delta, 0.), (10., 10.)];
+        let coords_x = rvec![(0., 0.), (5. + delta, 0.), (10., 10.)];
         let ls_x: LineString<f32> = coords_x.into_iter().collect();
         assert!(ls.abs_diff_eq(&ls_x, 1e-2));
         assert!(ls.abs_diff_ne(&ls_x, 1e-12));
 
-        let coords_y = vec![(0., 0.), (5., 0. + delta), (10., 10.)];
+        let coords_y = rvec![(0., 0.), (5., 0. + delta), (10., 10.)];
         let ls_y: LineString<f32> = coords_y.into_iter().collect();
         assert!(ls.abs_diff_eq(&ls_y, 1e-2));
         assert!(ls.abs_diff_ne(&ls_y, 1e-12));
 
         // Undersized, but otherwise equal.
-        let coords_x = vec![(0., 0.), (5., 0.)];
+        let coords_x = rvec![(0., 0.), (5., 0.)];
         let ls_under: LineString<f32> = coords_x.into_iter().collect();
         assert!(ls.abs_diff_ne(&ls_under, 1.));
 
         // Oversized, but otherwise equal.
-        let coords_x = vec![(0., 0.), (5., 0.), (10., 10.), (10., 100.)];
+        let coords_x = rvec![(0., 0.), (5., 0.), (10., 10.), (10., 100.)];
         let ls_oversized: LineString<f32> = coords_x.into_iter().collect();
         assert!(ls.abs_diff_ne(&ls_oversized, 1.));
     }
@@ -597,26 +609,26 @@ mod test {
     fn test_relative_eq() {
         let delta = 1e-6;
 
-        let coords = vec![(0., 0.), (5., 0.), (10., 10.)];
+        let coords = rvec![(0., 0.), (5., 0.), (10., 10.)];
         let ls: LineString<f32> = coords.into_iter().collect();
 
-        let coords_x = vec![(0., 0.), (5. + delta, 0.), (10., 10.)];
+        let coords_x = rvec![(0., 0.), (5. + delta, 0.), (10., 10.)];
         let ls_x: LineString<f32> = coords_x.into_iter().collect();
         assert!(ls.relative_eq(&ls_x, 1e-2, 1e-2));
         assert!(ls.relative_ne(&ls_x, 1e-12, 1e-12));
 
-        let coords_y = vec![(0., 0.), (5., 0. + delta), (10., 10.)];
+        let coords_y = rvec![(0., 0.), (5., 0. + delta), (10., 10.)];
         let ls_y: LineString<f32> = coords_y.into_iter().collect();
         assert!(ls.relative_eq(&ls_y, 1e-2, 1e-2));
         assert!(ls.relative_ne(&ls_y, 1e-12, 1e-12));
 
         // Undersized, but otherwise equal.
-        let coords_x = vec![(0., 0.), (5., 0.)];
+        let coords_x = rvec![(0., 0.), (5., 0.)];
         let ls_under: LineString<f32> = coords_x.into_iter().collect();
         assert!(ls.relative_ne(&ls_under, 1., 1.));
 
         // Oversized, but otherwise equal.
-        let coords_x = vec![(0., 0.), (5., 0.), (10., 10.), (10., 100.)];
+        let coords_x = rvec![(0., 0.), (5., 0.), (10., 10.), (10., 100.)];
         let ls_oversized: LineString<f32> = coords_x.into_iter().collect();
         assert!(ls.relative_ne(&ls_oversized, 1., 1.));
     }
@@ -626,14 +638,14 @@ mod test {
         let start = coord! { x: 0, y: 0 };
         let end = coord! { x: 10, y: 10 };
         let line = Line::new(start, end);
-        let expected = LineString::new(vec![start, end]);
+        let expected = LineString::new(rvec![start, end]);
 
         assert_eq!(expected, LineString::from(line));
 
         let start = coord! { x: 10., y: 0.5 };
         let end = coord! { x: 10000., y: 10.4 };
         let line = Line::new(start, end);
-        let expected = LineString::new(vec![start, end]);
+        let expected = LineString::new(rvec![start, end]);
 
         assert_eq!(expected, LineString::from(line));
     }

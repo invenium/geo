@@ -1,4 +1,5 @@
 use std::ops::Mul;
+use abi_stable::std_types::RVec;
 
 use num_traits::FromPrimitive;
 
@@ -87,7 +88,7 @@ fn smoothen_linestring<T>(linestring: &LineString<T>) -> LineString<T>
 where
     T: CoordFloat + Mul<T> + FromPrimitive,
 {
-    let mut out_coords: Vec<_> = Vec::with_capacity(linestring.0.len() * 2);
+    let mut out_coords: RVec<_> = RVec::with_capacity(linestring.0.len() * 2);
 
     if let (Some(first), Some(last)) = (linestring.0.first(), linestring.0.last()) {
         if first != last {
@@ -133,16 +134,17 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use crate::ChaikinSmoothing;
     use crate::{LineString, Polygon};
 
     #[test]
     fn linestring_open() {
-        let ls = LineString::from(vec![(3.0, 0.0), (6.0, 3.0), (3.0, 6.0), (0.0, 3.0)]);
+        let ls = LineString::from(rvec![(3.0, 0.0), (6.0, 3.0), (3.0, 6.0), (0.0, 3.0)]);
         let ls_out = ls.chaikin_smoothing(1);
         assert_eq!(
             ls_out,
-            LineString::from(vec![
+            LineString::from(rvec![
                 (3.0, 0.0),
                 (3.75, 0.75),
                 (5.25, 2.25),
@@ -157,7 +159,7 @@ mod test {
 
     #[test]
     fn linestring_closed() {
-        let ls = LineString::from(vec![
+        let ls = LineString::from(rvec![
             (3.0, 0.0),
             (6.0, 3.0),
             (3.0, 6.0),
@@ -167,7 +169,7 @@ mod test {
         let ls_out = ls.chaikin_smoothing(1);
         assert_eq!(
             ls_out,
-            LineString::from(vec![
+            LineString::from(rvec![
                 (3.75, 0.75),
                 (5.25, 2.25),
                 (5.25, 3.75),
@@ -184,19 +186,19 @@ mod test {
     #[test]
     fn polygon() {
         let poly = Polygon::new(
-            LineString::from(vec![
+            LineString::from(rvec![
                 (3.0, 0.0),
                 (6.0, 3.0),
                 (3.0, 6.0),
                 (0.0, 3.0),
                 (3.0, 0.0),
             ]),
-            vec![],
+            rvec![],
         );
         let poly_out = poly.chaikin_smoothing(1);
         assert_eq!(
             poly_out.exterior(),
-            &LineString::from(vec![
+            &LineString::from(rvec![
                 (3.75, 0.75),
                 (5.25, 2.25),
                 (5.25, 3.75),

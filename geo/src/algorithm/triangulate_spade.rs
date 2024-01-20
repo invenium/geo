@@ -114,10 +114,11 @@ where
     /// `constrained_outer_triangulation` functions.
     ///
     /// ```rust
+    /// use abi_stable::rvec;
     /// use geo::TriangulateSpade;
     /// use geo::{Polygon, LineString, Coord};
     /// let u_shape = Polygon::new(
-    ///     LineString::new(vec![
+    ///     LineString::new(rvec![
     ///         Coord { x: 0.0, y: 0.0 },
     ///         Coord { x: 1.0, y: 0.0 },
     ///         Coord { x: 1.0, y: 1.0 },
@@ -127,7 +128,7 @@ where
     ///         Coord { x: 3.0, y: 3.0 },
     ///         Coord { x: 0.0, y: 3.0 },
     ///     ]),
-    ///     vec![],
+    ///     rvec![],
     /// );
     /// let unconstrained_triangulation = u_shape.unconstrained_triangulation().unwrap();
     /// let num_triangles = unconstrained_triangulation.len();
@@ -171,10 +172,11 @@ where
     /// ```
     ///
     /// ```rust
+    /// use abi_stable::rvec;
     /// use geo::TriangulateSpade;
     /// use geo::{Polygon, LineString, Coord};
     /// let u_shape = Polygon::new(
-    ///     LineString::new(vec![
+    ///     LineString::new(rvec![
     ///         Coord { x: 0.0, y: 0.0 },
     ///         Coord { x: 1.0, y: 0.0 },
     ///         Coord { x: 1.0, y: 1.0 },
@@ -184,7 +186,7 @@ where
     ///         Coord { x: 3.0, y: 3.0 },
     ///         Coord { x: 0.0, y: 3.0 },
     ///     ]),
-    ///     vec![],
+    ///     rvec![],
     /// );
     /// // we use the default [`SpadeTriangulationConfig`] here
     /// let constrained_outer_triangulation =
@@ -245,10 +247,11 @@ where
     /// ```
     ///
     /// ```rust
+    /// use abi_stable::rvec;
     /// use geo::TriangulateSpade;
     /// use geo::{Polygon, LineString, Coord};
     /// let u_shape = Polygon::new(
-    ///     LineString::new(vec![
+    ///     LineString::new(rvec![
     ///         Coord { x: 0.0, y: 0.0 },
     ///         Coord { x: 1.0, y: 0.0 },
     ///         Coord { x: 1.0, y: 1.0 },
@@ -258,7 +261,7 @@ where
     ///         Coord { x: 3.0, y: 3.0 },
     ///         Coord { x: 0.0, y: 3.0 },
     ///     ]),
-    ///     vec![],
+    ///     rvec![],
     /// );
     /// // we use the default [`SpadeTriangulationConfig`] here
     /// let constrained_triangulation = u_shape.constrained_triangulation(Default::default()).unwrap();
@@ -582,6 +585,7 @@ fn to_spade_point<T: SpadeTriangulationFloat>(coord: Coord<T>) -> Point2<T> {
 
 #[cfg(test)]
 mod spade_triangulation {
+    use abi_stable::rvec;
     use super::*;
     use geo_types::*;
 
@@ -621,14 +625,14 @@ mod spade_triangulation {
     #[test]
     fn basic_polygon_triangulates() {
         let triangulation = Polygon::new(
-            LineString::new(vec![
+            LineString::new(rvec![
                 Coord { x: 0.0, y: 1.0 },
                 Coord { x: -1.0, y: 0.0 },
                 Coord { x: -0.5, y: -1.0 },
                 Coord { x: 0.5, y: -1.0 },
                 Coord { x: 1.0, y: 0.0 },
             ]),
-            vec![],
+            rvec![],
         )
         .unconstrained_triangulation();
 
@@ -697,7 +701,7 @@ mod spade_triangulation {
     #[test]
     fn u_shaped_polygon_triangulates_unconstrained() {
         let u_shape = Polygon::new(
-            LineString::new(vec![
+            LineString::new(rvec![
                 Coord { x: 0.0, y: 0.0 },
                 Coord { x: 1.0, y: 0.0 },
                 Coord { x: 1.0, y: 1.0 },
@@ -707,7 +711,7 @@ mod spade_triangulation {
                 Coord { x: 3.0, y: 3.0 },
                 Coord { x: 0.0, y: 3.0 },
             ]),
-            vec![],
+            rvec![],
         );
 
         let unconstrained_triangulation = u_shape.unconstrained_triangulation();
@@ -717,7 +721,7 @@ mod spade_triangulation {
     #[test]
     fn u_shaped_polygon_triangulates_constrained_outer() {
         let u_shape = Polygon::new(
-            LineString::new(vec![
+            LineString::new(rvec![
                 Coord { x: 0.0, y: 0.0 },
                 Coord { x: 1.0, y: 0.0 },
                 Coord { x: 1.0, y: 1.0 },
@@ -727,7 +731,7 @@ mod spade_triangulation {
                 Coord { x: 3.0, y: 3.0 },
                 Coord { x: 0.0, y: 3.0 },
             ]),
-            vec![],
+            rvec![],
         );
 
         let constrained_outer_triangulation =
@@ -738,7 +742,7 @@ mod spade_triangulation {
     #[test]
     fn u_shaped_polygon_triangulates_constrained_inner() {
         let u_shape = Polygon::new(
-            LineString::new(vec![
+            LineString::new(rvec![
                 Coord { x: 0.0, y: 0.0 },
                 Coord { x: 1.0, y: 0.0 },
                 Coord { x: 1.0, y: 1.0 },
@@ -748,7 +752,7 @@ mod spade_triangulation {
                 Coord { x: 3.0, y: 3.0 },
                 Coord { x: 0.0, y: 3.0 },
             ]),
-            vec![],
+            rvec![],
         );
 
         let constrained_triangulation = u_shape.constrained_triangulation(Default::default());
@@ -758,7 +762,7 @@ mod spade_triangulation {
     #[test]
     fn various_snap_radius_works() {
         let u_shape = Polygon::new(
-            LineString::new(vec![
+            LineString::new(rvec![
                 Coord { x: 0.0, y: 0.0 },
                 Coord { x: 1.0, y: 0.0 },
                 Coord { x: 1.0, y: 1.0 },
@@ -768,7 +772,7 @@ mod spade_triangulation {
                 Coord { x: 3.0, y: 3.0 },
                 Coord { x: 0.0, y: 3.0 },
             ]),
-            vec![],
+            rvec![],
         );
 
         for snap_with in (1..6).map(|pow| 0.1_f64.powi(pow)) {

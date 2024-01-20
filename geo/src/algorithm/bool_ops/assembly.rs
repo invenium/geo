@@ -2,6 +2,7 @@ use std::{
     cell::Cell,
     collections::{BTreeMap, HashMap, VecDeque},
 };
+use abi_stable::std_types::RVec;
 
 use crate::{
     sweep::{compare_crossings, Cross, CrossingsIter, LineOrPoint, SweepPoint},
@@ -10,6 +11,7 @@ use crate::{
     GeoFloat,
 };
 use geo_types::{LineString, MultiPolygon, Polygon};
+use geo_types::_alloc::rvec;
 
 /// Assemble polygons from boundary segments of the output region.
 ///
@@ -136,7 +138,7 @@ impl<T: GeoFloat> RegionAssembly<T> {
 
         let (rings, snakes_idx_map) = rings_from_snakes(&mut snakes[..]);
 
-        let mut polygons = vec![];
+        let mut polygons = rvec![];
         let mut children = HashMap::new();
         for (ring_idx, ring) in rings.iter().enumerate() {
             if ring.is_hole {
@@ -161,7 +163,7 @@ impl<T: GeoFloat> RegionAssembly<T> {
             if ring.is_hole {
                 continue;
             }
-            let mut holes = vec![];
+            let mut holes = rvec![];
             for child_idx in children.remove(&ring_idx).unwrap_or_default() {
                 let ls = split_ring(&rings[child_idx].ls, |ls| holes.push(ls));
                 holes.push(ls);
@@ -210,7 +212,7 @@ impl<T: GeoFloat> LineAssembly<T> {
                 .insert((geom_idx, geom.right()), (idx, false));
         }
     }
-    pub fn finish(self) -> Vec<LineString<T>> {
+    pub fn finish(self) -> RVec<LineString<T>> {
         self.segments
             .into_iter()
             .map(|pts| LineString::from_iter(pts.into_iter().map(|pt| *pt)))
@@ -239,7 +241,7 @@ fn split_ring<T: GeoFloat, F: FnMut(LineString<T>)>(
     mut cb: F,
 ) -> LineString<T> {
     let mut pts_map = BTreeMap::new();
-    let mut exterior = vec![];
+    let mut exterior = rvec![];
     for coord in ls.0.iter().copied() {
         if let Some(idx) = pts_map.get(&SweepPoint::from(coord)) {
             let new_ls: LineString<_> = exterior
@@ -309,7 +311,7 @@ impl<T: GeoFloat> Snake<T> {
         start_idx: usize,
         mut idx_cb: F,
     ) -> Option<Ring<T>> {
-        let mut output = vec![];
+        let mut output = rvec![];
 
         let mut idx = start_idx;
         let mut at_start = true;

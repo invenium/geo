@@ -1,10 +1,10 @@
 use crate::{CoordNum, Polygon};
 
-use alloc::vec;
-use alloc::vec::Vec;
 #[cfg(any(feature = "approx", test))]
 use approx::{AbsDiffEq, RelativeEq};
 use core::iter::FromIterator;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 /// A collection of [`Polygon`s](struct.Polygon.html). Can
 /// be created from a `Vec` of `Polygon`s, or from an
@@ -29,16 +29,16 @@ use core::iter::FromIterator;
 /// predicates that operate on it.
 #[derive(Eq, PartialEq, Clone, Debug, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct MultiPolygon<T: CoordNum = f64>(pub Vec<Polygon<T>>);
+pub struct MultiPolygon<T: CoordNum = f64>(pub RVec<Polygon<T>>);
 
 impl<T: CoordNum, IP: Into<Polygon<T>>> From<IP> for MultiPolygon<T> {
     fn from(x: IP) -> Self {
-        Self(vec![x.into()])
+        Self(rvec![x.into()])
     }
 }
 
-impl<T: CoordNum, IP: Into<Polygon<T>>> From<Vec<IP>> for MultiPolygon<T> {
-    fn from(x: Vec<IP>) -> Self {
+impl<T: CoordNum, IP: Into<Polygon<T>>> From<RVec<IP>> for MultiPolygon<T> {
+    fn from(x: RVec<IP>) -> Self {
         Self(x.into_iter().map(|p| p.into()).collect())
     }
 }
@@ -51,7 +51,7 @@ impl<T: CoordNum, IP: Into<Polygon<T>>> FromIterator<IP> for MultiPolygon<T> {
 
 impl<T: CoordNum> IntoIterator for MultiPolygon<T> {
     type Item = Polygon<T>;
-    type IntoIter = ::alloc::vec::IntoIter<Polygon<T>>;
+    type IntoIter = abi_stable::std_types::vec::IntoIter<Polygon<T>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -78,7 +78,7 @@ impl<'a, T: CoordNum> IntoIterator for &'a mut MultiPolygon<T> {
 
 impl<T: CoordNum> MultiPolygon<T> {
     /// Instantiate Self from the raw content value
-    pub fn new(value: Vec<Polygon<T>>) -> Self {
+    pub fn new(value: RVec<Polygon<T>>) -> Self {
         Self(value)
     }
 
@@ -106,12 +106,13 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{polygon, Polygon, MultiPolygon};
     ///
     /// let a_el: Polygon<f32> = polygon![(x: 0., y: 0.), (x: 5., y: 0.), (x: 7., y: 9.), (x: 0., y: 0.)];
-    /// let a = MultiPolygon::new(vec![a_el]);
+    /// let a = MultiPolygon::new(rvec![a_el]);
     /// let b_el: Polygon<f32> = polygon![(x: 0., y: 0.), (x: 5., y: 0.), (x: 7.01, y: 9.), (x: 0., y: 0.)];
-    /// let b = MultiPolygon::new(vec![b_el]);
+    /// let b = MultiPolygon::new(rvec![b_el]);
     ///
     /// approx::assert_relative_eq!(a, b, max_relative=0.1);
     /// approx::assert_relative_ne!(a, b, max_relative=0.001);
@@ -150,12 +151,13 @@ where
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{polygon, Polygon, MultiPolygon};
     ///
     /// let a_el: Polygon<f32> = polygon![(x: 0., y: 0.), (x: 5., y: 0.), (x: 7., y: 9.), (x: 0., y: 0.)];
-    /// let a = MultiPolygon::new(vec![a_el]);
+    /// let a = MultiPolygon::new(rvec![a_el]);
     /// let b_el: Polygon<f32> = polygon![(x: 0., y: 0.), (x: 5., y: 0.), (x: 7.01, y: 9.), (x: 0., y: 0.)];
-    /// let b = MultiPolygon::new(vec![b_el]);
+    /// let b = MultiPolygon::new(rvec![b_el]);
     ///
     /// approx::abs_diff_eq!(a, b, epsilon=0.1);
     /// approx::abs_diff_ne!(a, b, epsilon=0.001);
@@ -178,7 +180,7 @@ mod test {
 
     #[test]
     fn test_iter() {
-        let multi = MultiPolygon::new(vec![
+        let multi = MultiPolygon::new(rvec![
             polygon![(x: 0, y: 0), (x: 2, y: 0), (x: 1, y: 2), (x:0, y:0)],
             polygon![(x: 10, y: 10), (x: 12, y: 10), (x: 11, y: 12), (x:10, y:10)],
         ]);
@@ -219,7 +221,7 @@ mod test {
 
     #[test]
     fn test_iter_mut() {
-        let mut multi = MultiPolygon::new(vec![
+        let mut multi = MultiPolygon::new(rvec![
             polygon![(x: 0, y: 0), (x: 2, y: 0), (x: 1, y: 2), (x:0, y:0)],
             polygon![(x: 10, y: 10), (x: 12, y: 10), (x: 11, y: 12), (x:10, y:10)],
         ]);

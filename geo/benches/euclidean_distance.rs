@@ -5,7 +5,7 @@ use geo::{polygon, Polygon};
 fn criterion_benchmark(c: &mut criterion::Criterion) {
     c.bench_function("Polygon Euclidean distance RTree f64", |bencher| {
         let ls = geo_test_fixtures::norway_nonconvex_hull::<f64>();
-        let poly1 = Polygon::new(ls, vec![]);
+        let poly1 = Polygon::new(ls, rvec![]);
         let poly2 = polygon![
             (x: -6.064453, y: 68.49604),
             (x: -7.426758, y: 68.544315),
@@ -47,7 +47,7 @@ fn criterion_benchmark(c: &mut criterion::Criterion) {
         "Polygon Euclidean distance rotating calipers f64",
         |bencher| {
             let ls = geo_test_fixtures::norway_convex_hull::<f64>();
-            let poly1 = Polygon::new(ls, vec![]).convex_hull();
+            let poly1 = Polygon::new(ls, rvec![]).convex_hull();
             let poly2 = polygon![
                 (x: -6.064453, y: 68.49604),
                 (x: -7.426758, y: 68.688521),

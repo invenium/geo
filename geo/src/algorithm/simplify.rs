@@ -1,3 +1,4 @@
+use abi_stable::std_types::RVec;
 use crate::{Coord, GeoFloat, Line, LineString, MultiLineString, MultiPolygon, Polygon};
 use crate::{CoordsIter, EuclideanDistance};
 
@@ -20,20 +21,20 @@ where
 fn rdp<T, I: Iterator<Item = Coord<T>>, const INITIAL_MIN: usize>(
     coords: I,
     epsilon: &T,
-) -> Vec<Coord<T>>
+) -> RVec<Coord<T>>
 where
     T: GeoFloat,
 {
     // Epsilon must be greater than zero for any meaningful simplification to happen
     if *epsilon <= T::zero() {
-        return coords.collect::<Vec<Coord<T>>>();
+        return coords.collect::<RVec<Coord<T>>>();
     }
     let rdp_indices = &coords
         .enumerate()
         .map(|(idx, coord)| RdpIndex { index: idx, coord })
         .collect::<Vec<RdpIndex<T>>>();
     let mut simplified_len = rdp_indices.len();
-    let simplified_coords: Vec<_> =
+    let simplified_coords: RVec<_> =
         compute_rdp::<T, INITIAL_MIN>(rdp_indices, &mut simplified_len, epsilon)
             .into_iter()
             .map(|rdpindex| rdpindex.coord)
@@ -298,6 +299,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::*;
     use crate::{coord, line_string, polygon};
 
@@ -348,7 +350,7 @@ mod test {
 
     #[test]
     fn multilinestring() {
-        let mline = MultiLineString::new(vec![LineString::from(vec![
+        let mline = MultiLineString::new(rvec![LineString::from(rvec![
             (0.0, 0.0),
             (5.0, 4.0),
             (11.0, 5.5),
@@ -360,7 +362,7 @@ mod test {
 
         assert_eq!(
             mline2,
-            MultiLineString::new(vec![LineString::from(vec![
+            MultiLineString::new(rvec![LineString::from(rvec![
                 (0.0, 0.0),
                 (5.0, 4.0),
                 (11.0, 5.5),
@@ -396,7 +398,7 @@ mod test {
 
     #[test]
     fn multipolygon() {
-        let mpoly = MultiPolygon::new(vec![polygon![
+        let mpoly = MultiPolygon::new(rvec![polygon![
             (x: 0., y: 0.),
             (x: 0., y: 10.),
             (x: 5., y: 11.),
@@ -409,7 +411,7 @@ mod test {
 
         assert_eq!(
             mpoly2,
-            MultiPolygon::new(vec![polygon![
+            MultiPolygon::new(rvec![polygon![
                 (x: 0., y: 0.),
                 (x: 0., y: 10.),
                 (x: 10., y: 10.),
@@ -468,7 +470,7 @@ mod test {
         );
 
         // Polygon result should be five coordinates
-        let result = Polygon::new(ls, vec![]).simplify(&epsilon);
+        let result = Polygon::new(ls, rvec![]).simplify(&epsilon);
         assert_eq!(
             polygon![
                 ( x: 1.4324054e-16, y: 1.4324054e-16 ),

@@ -41,16 +41,17 @@ pub trait HasDimensions {
     /// Types like `Point` and `Rect`, which have at least one coordinate by construction, can
     /// never be considered empty.
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{Point, coord, LineString};
     /// use geo::HasDimensions;
     ///
-    /// let line_string = LineString::new(vec![
+    /// let line_string = LineString::new(rvec![
     ///     coord! { x: 0., y: 0. },
     ///     coord! { x: 10., y: 0. },
     /// ]);
     /// assert!(!line_string.is_empty());
     ///
-    /// let empty_line_string: LineString = LineString::new(vec![]);
+    /// let empty_line_string: LineString = LineString::new(rvec![]);
     /// assert!(empty_line_string.is_empty());
     ///
     /// let point = Point::new(0.0, 0.0);
@@ -66,6 +67,7 @@ pub trait HasDimensions {
     /// ## Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{GeometryCollection, Rect, Point};
     /// use geo::dimensions::{Dimensions, HasDimensions};
     ///
@@ -82,14 +84,14 @@ pub trait HasDimensions {
     /// assert_eq!(Dimensions::ZeroDimensional, degenerate_point_rect.dimensions());
     ///
     /// // collections inherit the greatest dimensionality of their elements
-    /// let geometry_collection = GeometryCollection::new_from(vec![degenerate_line_rect.into(), degenerate_point_rect.into()]);
+    /// let geometry_collection = GeometryCollection::new_from(rvec![degenerate_line_rect.into(), degenerate_point_rect.into()]);
     /// assert_eq!(Dimensions::OneDimensional, geometry_collection.dimensions());
     ///
     /// let point = Point::new(10.0, 10.0);
     /// assert_eq!(Dimensions::ZeroDimensional, point.dimensions());
     ///
     /// // An `Empty` dimensionality is distinct from, and less than, being 0-dimensional
-    /// let empty_collection = GeometryCollection::<f32>::new_from(vec![]);
+    /// let empty_collection = GeometryCollection::<f32>::new_from(rvec![]);
     /// assert_eq!(Dimensions::Empty, empty_collection.dimensions());
     /// assert!(empty_collection.dimensions() < point.dimensions());
     /// ```
@@ -100,6 +102,7 @@ pub trait HasDimensions {
     /// ## Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{GeometryCollection, Rect, Point};
     /// use geo::dimensions::{Dimensions, HasDimensions};
     ///
@@ -121,10 +124,10 @@ pub trait HasDimensions {
     /// assert_eq!(Dimensions::Empty, degenerate_point_rect.boundary_dimensions());
     ///
     /// // collections inherit the greatest dimensionality of their elements
-    /// let geometry_collection = GeometryCollection::new_from(vec![degenerate_line_rect.into(), degenerate_point_rect.into()]);
+    /// let geometry_collection = GeometryCollection::new_from(rvec![degenerate_line_rect.into(), degenerate_point_rect.into()]);
     /// assert_eq!(Dimensions::ZeroDimensional, geometry_collection.boundary_dimensions());
     ///
-    /// let geometry_collection = GeometryCollection::<f32>::new_from(vec![]);
+    /// let geometry_collection = GeometryCollection::<f32>::new_from(rvec![]);
     /// assert_eq!(Dimensions::Empty, geometry_collection.boundary_dimensions());
     /// ```
     fn boundary_dimensions(&self) -> Dimensions;

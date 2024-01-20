@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use abi_stable::rvec;
 
 use approx::relative_eq;
 use include_dir::{include_dir, Dir, DirEntry};
@@ -225,7 +226,7 @@ impl TestRunner {
                     // JTS returns a variety of Geometry types depending on the convex hull
                     // whereas geo *always* returns a polygon.
                     let expected = match expected {
-                        Geometry::LineString(ext) => Polygon::new(ext.clone(), vec![]),
+                        Geometry::LineString(ext) => Polygon::new(ext.clone(), rvec![]),
                         Geometry::Polygon(p) => p.clone(),
                         _ => {
                             let error_description = format!("expected result for convex hull is not a polygon or a linestring: {expected:?}" );
@@ -298,7 +299,7 @@ impl TestRunner {
                 Operation::BooleanOp { a, b, op, expected } => {
                     let expected = match expected {
                         Geometry::MultiPolygon(multi) => multi.clone(),
-                        Geometry::Polygon(poly) => MultiPolygon(vec![poly.clone()]),
+                        Geometry::Polygon(poly) => MultiPolygon(rvec![poly.clone()]),
                         _ => {
                             info!("skipping unsupported Union expectation: {:?}", expected);
                             continue;

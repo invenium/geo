@@ -1,6 +1,6 @@
 use crate::{CoordFloat, CoordNum, LineString, Point, Rect, Triangle};
-use alloc::vec;
-use alloc::vec::Vec;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 use num_traits::{Float, Signed};
 
 #[cfg(any(feature = "approx", test))]
@@ -70,7 +70,7 @@ use approx::{AbsDiffEq, RelativeEq};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Polygon<T: CoordNum = f64> {
     exterior: LineString<T>,
-    interiors: Vec<LineString<T>>,
+    interiors: RVec<LineString<T>>,
 }
 
 impl<T: CoordNum> Polygon<T> {
@@ -87,22 +87,24 @@ impl<T: CoordNum> Polygon<T> {
     /// Creating a `Polygon` with no interior rings:
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{LineString, Polygon};
     ///
     /// let polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![],
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![],
     /// );
     /// ```
     ///
     /// Creating a `Polygon` with an interior ring:
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{LineString, Polygon};
     ///
     /// let polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![LineString::from(vec![
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![LineString::from(rvec![
     ///         (0.1, 0.1),
     ///         (0.9, 0.9),
     ///         (0.9, 0.1),
@@ -115,16 +117,17 @@ impl<T: CoordNum> Polygon<T> {
     /// `LineString`s no longer match, those `LineString`s [will be closed]:
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, LineString, Polygon};
     ///
-    /// let mut polygon = Polygon::new(LineString::from(vec![(0., 0.), (1., 1.), (1., 0.)]), vec![]);
+    /// let mut polygon = Polygon::new(LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.)]), rvec![]);
     ///
     /// assert_eq!(
     ///     polygon.exterior(),
-    ///     &LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.),])
+    ///     &LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.),])
     /// );
     /// ```
-    pub fn new(mut exterior: LineString<T>, mut interiors: Vec<LineString<T>>) -> Self {
+    pub fn new(mut exterior: LineString<T>, mut interiors: RVec<LineString<T>>) -> Self {
         exterior.close();
         for interior in &mut interiors {
             interior.close();
@@ -141,11 +144,12 @@ impl<T: CoordNum> Polygon<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{LineString, Polygon};
     ///
     /// let mut polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![LineString::from(vec![
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![LineString::from(rvec![
     ///         (0.1, 0.1),
     ///         (0.9, 0.9),
     ///         (0.9, 0.1),
@@ -157,12 +161,12 @@ impl<T: CoordNum> Polygon<T> {
     ///
     /// assert_eq!(
     ///     exterior,
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.),])
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.),])
     /// );
     ///
     /// assert_eq!(
     ///     interiors,
-    ///     vec![LineString::from(vec![
+    ///     rvec![LineString::from(rvec![
     ///         (0.1, 0.1),
     ///         (0.9, 0.9),
     ///         (0.9, 0.1),
@@ -170,7 +174,7 @@ impl<T: CoordNum> Polygon<T> {
     ///     ])]
     /// );
     /// ```
-    pub fn into_inner(self) -> (LineString<T>, Vec<LineString<T>>) {
+    pub fn into_inner(self) -> (LineString<T>, RVec<LineString<T>>) {
         (self.exterior, self.interiors)
     }
 
@@ -179,11 +183,12 @@ impl<T: CoordNum> Polygon<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{LineString, Polygon};
     ///
-    /// let exterior = LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]);
+    /// let exterior = LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]);
     ///
-    /// let polygon = Polygon::new(exterior.clone(), vec![]);
+    /// let polygon = Polygon::new(exterior.clone(), rvec![]);
     ///
     /// assert_eq!(polygon.exterior(), &exterior);
     /// ```
@@ -199,11 +204,12 @@ impl<T: CoordNum> Polygon<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, LineString, Polygon};
     ///
     /// let mut polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![],
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![],
     /// );
     ///
     /// polygon.exterior_mut(|exterior| {
@@ -212,7 +218,7 @@ impl<T: CoordNum> Polygon<T> {
     ///
     /// assert_eq!(
     ///     polygon.exterior(),
-    ///     &LineString::from(vec![(0., 0.), (1., 2.), (1., 0.), (0., 0.),])
+    ///     &LineString::from(rvec![(0., 0.), (1., 2.), (1., 0.), (0., 0.),])
     /// );
     /// ```
     ///
@@ -220,11 +226,12 @@ impl<T: CoordNum> Polygon<T> {
     /// longer match, the `LineString` [will be closed]:
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, LineString, Polygon};
     ///
     /// let mut polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![],
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![],
     /// );
     ///
     /// polygon.exterior_mut(|exterior| {
@@ -233,7 +240,7 @@ impl<T: CoordNum> Polygon<T> {
     ///
     /// assert_eq!(
     ///     polygon.exterior(),
-    ///     &LineString::from(vec![(0., 1.), (1., 1.), (1., 0.), (0., 0.), (0., 1.),])
+    ///     &LineString::from(rvec![(0., 1.), (1., 1.), (1., 0.), (0., 0.), (0., 1.),])
     /// );
     /// ```
     ///
@@ -261,9 +268,10 @@ impl<T: CoordNum> Polygon<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, LineString, Polygon};
     ///
-    /// let interiors = vec![LineString::from(vec![
+    /// let interiors = rvec![LineString::from(rvec![
     ///     (0.1, 0.1),
     ///     (0.9, 0.9),
     ///     (0.9, 0.1),
@@ -271,7 +279,7 @@ impl<T: CoordNum> Polygon<T> {
     /// ])];
     ///
     /// let polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
     ///     interiors.clone(),
     /// );
     ///
@@ -290,11 +298,12 @@ impl<T: CoordNum> Polygon<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, LineString, Polygon};
     ///
     /// let mut polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![LineString::from(vec![
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![LineString::from(rvec![
     ///         (0.1, 0.1),
     ///         (0.9, 0.9),
     ///         (0.9, 0.1),
@@ -308,7 +317,7 @@ impl<T: CoordNum> Polygon<T> {
     ///
     /// assert_eq!(
     ///     polygon.interiors(),
-    ///     &[LineString::from(vec![
+    ///     &[LineString::from(rvec![
     ///         (0.1, 0.1),
     ///         (0.8, 0.8),
     ///         (0.9, 0.1),
@@ -321,11 +330,12 @@ impl<T: CoordNum> Polygon<T> {
     /// longer match, those `LineString`s [will be closed]:
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, LineString, Polygon};
     ///
     /// let mut polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![LineString::from(vec![
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![LineString::from(rvec![
     ///         (0.1, 0.1),
     ///         (0.9, 0.9),
     ///         (0.9, 0.1),
@@ -339,7 +349,7 @@ impl<T: CoordNum> Polygon<T> {
     ///
     /// assert_eq!(
     ///     polygon.interiors(),
-    ///     &[LineString::from(vec![
+    ///     &[LineString::from(rvec![
     ///         (0.1, 0.2),
     ///         (0.9, 0.9),
     ///         (0.9, 0.1),
@@ -379,20 +389,21 @@ impl<T: CoordNum> Polygon<T> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo_types::{coord, LineString, Polygon};
     ///
     /// let mut polygon = Polygon::new(
-    ///     LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
-    ///     vec![],
+    ///     LineString::from(rvec![(0., 0.), (1., 1.), (1., 0.), (0., 0.)]),
+    ///     rvec![],
     /// );
     ///
     /// assert_eq!(polygon.interiors().len(), 0);
     ///
-    /// polygon.interiors_push(vec![(0.1, 0.1), (0.9, 0.9), (0.9, 0.1)]);
+    /// polygon.interiors_push(rvec![(0.1, 0.1), (0.9, 0.9), (0.9, 0.1)]);
     ///
     /// assert_eq!(
     ///     polygon.interiors(),
-    ///     &[LineString::from(vec![
+    ///     &[LineString::from(rvec![
     ///         (0.1, 0.1),
     ///         (0.9, 0.9),
     ///         (0.9, 0.1),
@@ -468,7 +479,7 @@ impl<T: CoordFloat + Signed> Polygon<T> {
 impl<T: CoordNum> From<Rect<T>> for Polygon<T> {
     fn from(r: Rect<T>) -> Self {
         Polygon::new(
-            vec![
+            rvec![
                 (r.min().x, r.min().y),
                 (r.max().x, r.min().y),
                 (r.max().x, r.max().y),
@@ -476,14 +487,14 @@ impl<T: CoordNum> From<Rect<T>> for Polygon<T> {
                 (r.min().x, r.min().y),
             ]
             .into(),
-            Vec::new(),
+            RVec::new(),
         )
     }
 }
 
 impl<T: CoordNum> From<Triangle<T>> for Polygon<T> {
     fn from(t: Triangle<T>) -> Self {
-        Polygon::new(vec![t.0, t.1, t.2, t.0].into(), Vec::new())
+        Polygon::new(rvec![t.0, t.1, t.2, t.0].into(), RVec::new())
     }
 }
 

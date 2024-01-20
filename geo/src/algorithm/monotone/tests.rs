@@ -1,4 +1,5 @@
 use std::{fmt::Display, str::FromStr};
+use abi_stable::rvec;
 
 use approx::RelativeEq;
 use geo_types::Polygon;
@@ -58,7 +59,7 @@ fn check_monotone_subdivision<T: GeoFloat + FromStr + Default + Display + Relati
             error!("Got an unclosed line string");
             error!("{}", top.to_wkt());
         } else {
-            let poly = Polygon::new(top, vec![]);
+            let poly = Polygon::new(top, rvec![]);
             sub_area = sub_area + twice_polygon_area(&poly);
             info!("{}", poly.to_wkt());
 

@@ -1,3 +1,5 @@
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 use crate::{
     CoordFloat, EuclideanLength, Line, LineInterpolatePoint, LineString, MultiLineString,
     MultiPolygon, Point, Polygon, Rect, Triangle,
@@ -10,11 +12,12 @@ use crate::{
 ///
 /// # Examples
 /// ```
+/// use abi_stable::rvec;
 /// use geo::{coord, Line, LineString};
 /// use geo::Densify;
 ///
 /// let line: Line<f64> = Line::new(coord! {x: 0.0, y: 6.0}, coord! {x: 1.0, y: 8.0});
-/// let correct: LineString<f64> = vec![[0.0, 6.0], [0.5, 7.0], [1.0, 8.0]].into();
+/// let correct: LineString<f64> = rvec![[0.0, 6.0], [0.5, 7.0], [1.0, 8.0]].into();
 /// let max_dist = 2.0;
 /// let densified = line.densify(max_dist);
 /// assert_eq!(densified, correct);
@@ -26,7 +29,7 @@ pub trait Densify<F: CoordFloat> {
 }
 
 // Helper for densification trait
-fn densify_line<T: CoordFloat>(line: Line<T>, container: &mut Vec<Point<T>>, max_distance: T) {
+fn densify_line<T: CoordFloat>(line: Line<T>, container: &mut RVec<Point<T>>, max_distance: T) {
     assert!(max_distance > T::zero());
     container.push(line.start_point());
     let num_segments = (line.euclidean_length() / max_distance)
@@ -107,10 +110,10 @@ where
 
     fn densify(&self, max_distance: T) -> Self::Output {
         if self.0.is_empty() {
-            return LineString::new(vec![]);
+            return LineString::new(rvec![]);
         }
 
-        let mut new_line = vec![];
+        let mut new_line = rvec![];
 
         self.lines()
             .for_each(|line| densify_line(line, &mut new_line, max_distance));
@@ -129,7 +132,7 @@ where
     type Output = LineString<T>;
 
     fn densify(&self, max_distance: T) -> Self::Output {
-        let mut new_line = vec![];
+        let mut new_line = rvec![];
         densify_line(*self, &mut new_line, max_distance);
         // we're done, push the last coordinate on to finish
         new_line.push(self.end_point());
@@ -171,11 +174,11 @@ mod tests {
     #[test]
     fn test_polygon_densify() {
         let linestring: LineString<f64> =
-            vec![[-5.0, 0.0], [0.0, 5.0], [5.0, 0.0], [-5.0, 0.0]].into();
+            rvec![[-5.0, 0.0], [0.0, 5.0], [5.0, 0.0], [-5.0, 0.0]].into();
         let interior: LineString<f64> =
-            vec![[-3.0, 0.0], [0.0, 3.0], [3.0, 0.0], [-3.0, 0.0]].into();
-        let polygon = Polygon::new(linestring, vec![interior]);
-        let correct_ext: LineString<f64> = LineString(vec![
+            rvec![[-3.0, 0.0], [0.0, 3.0], [3.0, 0.0], [-3.0, 0.0]].into();
+        let polygon = Polygon::new(linestring, rvec![interior]);
+        let correct_ext: LineString<f64> = LineString(rvec![
             Coord { x: -5.0, y: 0.0 },
             Coord { x: -3.75, y: 1.25 },
             Coord { x: -2.5, y: 2.5 },
@@ -194,7 +197,7 @@ mod tests {
             Coord { x: -3.0, y: 0.0 },
             Coord { x: -5.0, y: 0.0 },
         ]);
-        let correct_int: LineString<f64> = LineString(vec![
+        let correct_int: LineString<f64> = LineString(rvec![
             Coord { x: -3.0, y: 0.0 },
             Coord { x: -2.0, y: 1.0 },
             Coord { x: -1.0, y: 2.0 },
@@ -206,7 +209,7 @@ mod tests {
             Coord { x: -1.0, y: 0.0 },
             Coord { x: -3.0, y: 0.0 },
         ]);
-        let correct_polygon = Polygon::new(correct_ext, vec![correct_int]);
+        let correct_polygon = Polygon::new(correct_ext, rvec![correct_int]);
         let max_dist = 2.0;
         let densified = polygon.densify(max_dist);
         assert_eq!(densified, correct_polygon);
@@ -214,7 +217,7 @@ mod tests {
 
     #[test]
     fn test_empty_linestring_densify() {
-        let linestring = LineString::<f64>::new(vec![]);
+        let linestring = LineString::<f64>::new(rvec![]);
         let max_dist = 2.0;
         let densified = linestring.densify(max_dist);
         assert!(densified.0.is_empty());
@@ -223,8 +226,8 @@ mod tests {
     #[test]
     fn test_linestring_densify() {
         let linestring: LineString<f64> =
-            vec![[-1.0, 0.0], [0.0, 0.0], [0.0, 6.0], [1.0, 8.0]].into();
-        let correct: LineString<f64> = vec![
+            rvec![[-1.0, 0.0], [0.0, 0.0], [0.0, 6.0], [1.0, 8.0]].into();
+        let correct: LineString<f64> = rvec![
             [-1.0, 0.0],
             [0.0, 0.0],
             [0.0, 2.0],
@@ -242,7 +245,7 @@ mod tests {
     #[test]
     fn test_line_densify() {
         let line: Line<f64> = Line::new(coord! {x: 0.0, y: 6.0}, coord! {x: 1.0, y: 8.0});
-        let correct: LineString<f64> = vec![[0.0, 6.0], [0.5, 7.0], [1.0, 8.0]].into();
+        let correct: LineString<f64> = rvec![[0.0, 6.0], [0.5, 7.0], [1.0, 8.0]].into();
         let max_dist = 2.0;
         let densified = line.densify(max_dist);
         assert_eq!(densified, correct);

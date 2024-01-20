@@ -264,6 +264,9 @@ mod test {
     use crate::Area;
     use crate::{coord, polygon, wkt, Line, MultiPolygon, Polygon, Rect, Triangle};
 
+    use abi_stable::rvec;
+    use abi_stable::std_types::RVec;
+
     // Area of the polygon
     #[test]
     fn area_empty_polygon_test() {
@@ -297,9 +300,9 @@ mod test {
                             y: angle.sin(),
                         }
                     })
-                    .collect::<Vec<_>>()
+                    .collect::<RVec<_>>()
                     .into(),
-                vec![],
+                rvec![],
             )
         };
 
@@ -375,7 +378,7 @@ mod test {
             (x: 5., y: 6.),
             (x: 5., y: 5.)
         ];
-        let mpoly = MultiPolygon::new(vec![poly0, poly1, poly2]);
+        let mpoly = MultiPolygon::new(rvec![poly0, poly1, poly2]);
         assert_relative_eq!(mpoly.signed_area(), 102.);
         assert_relative_eq!(mpoly.signed_area(), 102.);
     }
@@ -420,7 +423,7 @@ mod test {
         ];
         let polygon_area = polygon_cw.unsigned_area();
 
-        let multi_polygon = MultiPolygon::new(vec![polygon_cw, polygon_ccw]);
+        let multi_polygon = MultiPolygon::new(rvec![polygon_cw, polygon_ccw]);
 
         assert_eq!(polygon_area * 2., multi_polygon.unsigned_area());
     }

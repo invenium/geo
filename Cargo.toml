@@ -10,7 +10,9 @@ members = [
 ]
 
 [patch.crates-io]
-
 # Ensure any transitive dependencies also use the local geo/geo-types
 geo = { path = "geo" }
 geo-types = { path = "geo-types" }
+geojson = { git = "https://github.com/invenium/georust-geojson.git", tag = "v0.24.1-stable-abi" }
+rstar = { git = "https://github.com/invenium/georust-rstar.git", tag = "v0.11.0-stable-abi" }
+wkt = { git = "https://github.com/invenium/georust-wkt.git", tag = "v0.10.3-stable-abi" }

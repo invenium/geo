@@ -5,6 +5,8 @@ use crate::{
 };
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 use rstar::primitives::CachedEnvelope;
 use rstar::{RTree, RTreeNum};
@@ -204,13 +206,13 @@ fn recompute_triangles<T>(
 }
 
 // Wrapper for visvalingam_indices, mapping indices back to points
-fn visvalingam<T>(orig: &LineString<T>, epsilon: &T) -> Vec<Coord<T>>
+fn visvalingam<T>(orig: &LineString<T>, epsilon: &T) -> RVec<Coord<T>>
 where
     T: CoordFloat,
 {
     // Epsilon must be greater than zero for any meaningful simplification to happen
     if *epsilon <= T::zero() {
-        return orig.0.to_vec();
+        return orig.0.to_owned();
     }
     let subset = visvalingam_indices(orig, epsilon);
     // filter orig using the indices
@@ -239,11 +241,11 @@ fn vwp_wrapper<T, const INITIAL_MIN: usize, const MIN_POINTS: usize>(
     exterior: &LineString<T>,
     interiors: Option<&[LineString<T>]>,
     epsilon: &T,
-) -> Vec<Vec<Coord<T>>>
+) -> RVec<RVec<Coord<T>>>
 where
     T: CoordFloat + RTreeNum + HasKernel,
 {
-    let mut rings = vec![];
+    let mut rings = rvec![];
     // Populate R* tree with exterior and interior samples, if any
     let mut tree: RTree<CachedEnvelope<_>> = RTree::bulk_load(
         exterior
@@ -289,12 +291,12 @@ fn visvalingam_preserve<T, const INITIAL_MIN: usize, const MIN_POINTS: usize>(
     orig: &LineString<T>,
     epsilon: &T,
     tree: &mut RTree<CachedEnvelope<Line<T>>>,
-) -> Vec<Coord<T>>
+) -> RVec<Coord<T>>
 where
     T: CoordFloat + RTreeNum + HasKernel,
 {
     if orig.0.len() < 3 || *epsilon <= T::zero() {
-        return orig.0.to_vec();
+        return orig.0.to_owned();
     }
     let max = orig.0.len();
     let mut counter = orig.0.len();
@@ -684,6 +686,8 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
+    use abi_stable::std_types::RVec;
     use super::{visvalingam, vwp_wrapper, SimplifyVw, SimplifyVwPreserve};
     use crate::{
         line_string, polygon, Coord, LineString, MultiLineString, MultiPolygon, Point, Polygon,
@@ -784,7 +788,7 @@ mod test {
             (x: -22.869140625, y: 43.80817468459856),
             (x: -24.451171875, y: 35.266685523707665)
         ];
-        let poly = Polygon::new(outer.clone(), vec![inner]);
+        let poly = Polygon::new(outer.clone(), rvec![inner]);
         let simplified = poly.simplify_vw_preserve(&95.4);
         assert_relative_eq!(simplified.exterior(), &outer, epsilon = 1e-6);
     }
@@ -815,7 +819,7 @@ mod test {
             (x: -22.869140625, y: 43.80817468459856),
             (x: -24.451171875, y: 35.266685523707665)
         ];
-        let poly = Polygon::new(outer.clone(), vec![inner]);
+        let poly = Polygon::new(outer.clone(), rvec![inner]);
         let simplified = poly.simplify_vw_preserve(&95.4);
         assert_eq!(simplified.exterior(), &outer);
         assert_eq!(simplified.interiors()[0], correct_inner);
@@ -846,15 +850,15 @@ mod test {
     }
     #[test]
     fn visvalingam_test_empty_linestring() {
-        let vec: Vec<[f32; 2]> = Vec::new();
+        let vec: RVec<[f32; 2]> = RVec::new();
         let compare = Vec::new();
         let simplified = visvalingam(&LineString::from(vec), &1.0);
         assert_eq!(simplified, compare);
     }
     #[test]
     fn visvalingam_test_two_point_linestring() {
-        let vec = vec![Point::new(0.0, 0.0), Point::new(27.8, 0.1)];
-        let compare = vec![Coord::from((0.0, 0.0)), Coord::from((27.8, 0.1))];
+        let vec = rvec![Point::new(0.0, 0.0), Point::new(27.8, 0.1)];
+        let compare = rvec![Coord::from((0.0, 0.0)), Coord::from((27.8, 0.1))];
         let simplified = visvalingam(&LineString::from(vec), &1.0);
         assert_eq!(simplified, compare);
     }
@@ -869,15 +873,15 @@ mod test {
             (7.0, 25.0),
             (10.0, 10.0),
         ];
-        let points_ls: Vec<_> = points.iter().map(|e| Point::new(e.0, e.1)).collect();
+        let points_ls: RVec<_> = points.iter().map(|e| Point::new(e.0, e.1)).collect();
 
         let correct = [(5.0, 2.0), (7.0, 25.0), (10.0, 10.0)];
-        let correct_ls: Vec<_> = correct.iter().map(|e| Point::new(e.0, e.1)).collect();
+        let correct_ls: RVec<_> = correct.iter().map(|e| Point::new(e.0, e.1)).collect();
 
-        let mline = MultiLineString::new(vec![LineString::from(points_ls)]);
+        let mline = MultiLineString::new(rvec![LineString::from(points_ls)]);
         assert_relative_eq!(
             mline.simplify_vw(&30.),
-            MultiLineString::new(vec![LineString::from(correct_ls)]),
+            MultiLineString::new(rvec![LineString::from(correct_ls)]),
             epsilon = 1e-6
         );
     }
@@ -910,8 +914,8 @@ mod test {
 
     #[test]
     fn multipolygon() {
-        let mpoly = MultiPolygon::new(vec![Polygon::new(
-            LineString::from(vec![
+        let mpoly = MultiPolygon::new(rvec![Polygon::new(
+            LineString::from(rvec![
                 (0., 0.),
                 (0., 10.),
                 (5., 11.),
@@ -919,16 +923,16 @@ mod test {
                 (10., 0.),
                 (0., 0.),
             ]),
-            vec![],
+            rvec![],
         )]);
 
         let mpoly2 = mpoly.simplify_vw(&10.);
 
         assert_relative_eq!(
             mpoly2,
-            MultiPolygon::new(vec![Polygon::new(
-                LineString::from(vec![(0., 0.), (0., 10.), (10., 10.), (10., 0.), (0., 0.)]),
-                vec![],
+            MultiPolygon::new(rvec![Polygon::new(
+                LineString::from(rvec![(0., 0.), (0., 10.), (10., 10.), (10., 0.), (0., 0.)]),
+                rvec![],
             )]),
             epsilon = 1e-6
         );

@@ -150,15 +150,14 @@ pub mod _alloc {
     //! Needed to access these types from `alloc` in macros when the std feature is
     //! disabled and the calling context is missing `extern crate alloc`. These are
     //! _not_ meant for public use.
-    pub use ::alloc::vec;
+    pub use ::abi_stable::rvec;
 }
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
-
     use super::*;
     use core::convert::TryFrom;
+    use abi_stable::rvec;
 
     #[test]
     fn type_test() {
@@ -190,13 +189,13 @@ mod tests {
 
     #[test]
     fn polygon_new_test() {
-        let exterior = LineString::new(vec![
+        let exterior = LineString::new(rvec![
             coord! { x: 0., y: 0. },
             coord! { x: 1., y: 1. },
             coord! { x: 1., y: 0. },
             coord! { x: 0., y: 0. },
         ]);
-        let interiors = vec![LineString::new(vec![
+        let interiors = rvec![LineString::new(rvec![
             coord! { x: 0.1, y: 0.1 },
             coord! { x: 0.9, y: 0.9 },
             coord! { x: 0.9, y: 0.1 },
@@ -210,16 +209,16 @@ mod tests {
 
     #[test]
     fn iters() {
-        let _: MultiPoint<_> = vec![(0., 0.), (1., 2.)].into();
-        let _: MultiPoint<_> = vec![(0., 0.), (1., 2.)].into_iter().collect();
+        let _: MultiPoint<_> = rvec![(0., 0.), (1., 2.)].into();
+        let _: MultiPoint<_> = rvec![(0., 0.), (1., 2.)].into_iter().collect();
 
-        let mut l1: LineString<_> = vec![(0., 0.), (1., 2.)].into();
+        let mut l1: LineString<_> = rvec![(0., 0.), (1., 2.)].into();
         assert_eq!(l1[1], coord! { x: 1., y: 2. }); // index into linestring
-        let _: LineString<_> = vec![(0., 0.), (1., 2.)].into_iter().collect();
+        let _: LineString<_> = rvec![(0., 0.), (1., 2.)].into_iter().collect();
 
         // index mutably into a linestring
         l1[0] = coord! { x: 1., y: 1. };
-        assert_eq!(l1, vec![(1., 1.), (1., 2.)].into());
+        assert_eq!(l1, rvec![(1., 1.), (1., 2.)].into());
     }
 
     #[test]
@@ -298,8 +297,8 @@ mod tests {
         assert_eq!(
             p,
             Polygon::new(
-                vec![(-1., -1.), (1., -1.), (1., 1.), (-1., 1.), (-1., -1.)].into(),
-                vec![]
+                rvec![(-1., -1.), (1., -1.), (1., 1.), (-1., 1.), (-1., -1.)].into(),
+                rvec![]
             )
         );
     }

@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 
+use abi_stable::std_types::RVec;
 use geo_types::{Coord, LineString, MultiPolygon, Polygon};
+use geo_types::_alloc::rvec;
 
 pub fn convert_poly(poly: &Polygon<f64>) -> gt_prev::Polygon<f64> {
     let ext: Vec<_> = poly
@@ -17,13 +19,13 @@ pub fn convert_mpoly(mpoly: &MultiPolygon<f64>) -> gt_prev::MultiPolygon<f64> {
 }
 
 pub fn convert_back_poly(poly: &gt_prev::Polygon<f64>) -> Polygon<f64> {
-    let ext: Vec<_> = poly
+    let ext: RVec<_> = poly
         .exterior()
         .0
         .iter()
         .map(|c| Coord { x: c.x, y: c.y })
         .collect();
-    Polygon::new(LineString(ext), vec![])
+    Polygon::new(LineString(ext), rvec![])
 }
 
 pub fn convert_back_mpoly(mpoly: &gt_prev::MultiPolygon<f64>) -> MultiPolygon<f64> {

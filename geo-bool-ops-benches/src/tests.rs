@@ -22,6 +22,7 @@ use wkt::ToWkt;
 pub mod bops_utils;
 
 use bops_utils::*;
+use geo_types::_alloc::rvec;
 
 pub(super) fn init_log() {
     use pretty_env_logger::env_logger;
@@ -36,7 +37,7 @@ fn generate_ds() -> Result<(), Box<dyn Error>> {
     init_log();
 
     let proj_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    let mut cases = vec![];
+    let mut cases = rvec![];
     for fix in glob(&format!(
         "{proj_path}/fixtures/rust-geo-booleanop-fixtures/**/*.geojson"
     ))? {

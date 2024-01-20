@@ -1,3 +1,5 @@
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 use num_traits::FromPrimitive;
 
 use crate::{
@@ -18,12 +20,13 @@ use crate::{HaversineIntermediate, HaversineLength};
 ///
 /// # Examples
 /// ```
+/// use abi_stable::rvec;
 /// use geo::{coord, Line, LineString};
 /// use geo::DensifyHaversine;
 ///
 /// let line = Line::new(coord! {x: 0.0, y: 0.0}, coord! { x: 0.0, y: 1.0 });
 /// // known output
-/// let output: LineString = vec![[0.0, 0.0], [0.0, 0.5], [0.0, 1.0]].into();
+/// let output: LineString = rvec![[0.0, 0.0], [0.0, 0.5], [0.0, 1.0]].into();
 /// // densify
 /// let dense = line.densify_haversine(100000.0);
 /// assert_eq!(dense, output);
@@ -37,7 +40,7 @@ pub trait DensifyHaversine<F: CoordFloat> {
 // Helper for densification trait
 fn densify_line<T: CoordFloat + FromPrimitive>(
     line: Line<T>,
-    container: &mut Vec<Point<T>>,
+    container: &mut RVec<Point<T>>,
     max_distance: T,
 ) {
     assert!(max_distance > T::zero());
@@ -121,10 +124,10 @@ where
 
     fn densify_haversine(&self, max_distance: T) -> Self::Output {
         if self.coords_count() == 0 {
-            return LineString::new(vec![]);
+            return LineString::new(rvec![]);
         }
 
-        let mut new_line = vec![];
+        let mut new_line = rvec![];
         self.lines()
             .for_each(|line| densify_line(line, &mut new_line, max_distance));
         // we're done, push the last coordinate on to finish
@@ -142,7 +145,7 @@ where
     type Output = LineString<T>;
 
     fn densify_haversine(&self, max_distance: T) -> Self::Output {
-        let mut new_line = vec![];
+        let mut new_line = rvec![];
         densify_line(*self, &mut new_line, max_distance);
         // we're done, push the last coordinate on to finish
         new_line.push(self.end_point());
@@ -183,7 +186,7 @@ mod tests {
 
     #[test]
     fn test_polygon_densify() {
-        let exterior: LineString = vec![
+        let exterior: LineString = rvec![
             [4.925, 45.804],
             [4.732, 45.941],
             [4.935, 46.513],
@@ -194,9 +197,9 @@ mod tests {
         ]
         .into();
 
-        let polygon = Polygon::new(exterior, vec![]);
+        let polygon = Polygon::new(exterior, rvec![]);
 
-        let output_exterior: LineString = vec![
+        let output_exterior: LineString = rvec![
             [4.925, 45.804],
             [4.732, 45.941],
             [4.8329711649985505, 46.2270449096239],
@@ -216,7 +219,7 @@ mod tests {
 
     #[test]
     fn test_linestring_densify() {
-        let linestring: LineString = vec![
+        let linestring: LineString = rvec![
             [-3.202, 55.9471],
             [-3.2012, 55.9476],
             [-3.1994, 55.9476],
@@ -228,7 +231,7 @@ mod tests {
         ]
         .into();
 
-        let output: LineString = vec![
+        let output: LineString = rvec![
             [-3.202, 55.9471],
             [-3.2012, 55.9476],
             [-3.2002999999999995, 55.94760000327935],
@@ -248,7 +251,7 @@ mod tests {
 
     #[test]
     fn test_line_densify() {
-        let output: LineString = vec![[0.0, 0.0], [0.0, 0.5], [0.0, 1.0]].into();
+        let output: LineString = rvec![[0.0, 0.0], [0.0, 0.5], [0.0, 1.0]].into();
         let line = Line::new(coord! {x: 0.0, y: 0.0}, coord! { x: 0.0, y: 1.0 });
         let dense = line.densify_haversine(100000.0);
         assert_relative_eq!(dense, output);
@@ -256,7 +259,7 @@ mod tests {
 
     #[test]
     fn test_empty_linestring() {
-        let linestring: LineString<f64> = LineString::new(vec![]);
+        let linestring: LineString<f64> = LineString::new(rvec![]);
         let dense = linestring.densify_haversine(10.0);
         assert_eq!(0, dense.coords_count());
     }

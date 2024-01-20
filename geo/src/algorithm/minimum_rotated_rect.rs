@@ -13,13 +13,14 @@ use crate::{
 /// # Examples
 ///
 /// ```
+/// use abi_stable::rvec;
 /// use geo_types::{line_string, polygon, LineString, Polygon};
 /// use geo::MinimumRotatedRect;
 /// let poly: Polygon<f64> = polygon![(x: 3.3, y: 30.4), (x: 1.7, y: 24.6), (x: 13.4, y: 25.1), (x: 14.4, y: 31.0),(x:3.3,y:30.4)];
 /// let mbr = MinimumRotatedRect::minimum_rotated_rect(&poly).unwrap();
 /// assert_eq!(
 ///     mbr.exterior(),
-///     &LineString::from(vec![
+///     &LineString::from(rvec![
 ///         (1.7000000000000006, 24.6),
 ///         (1.4501458363715918, 30.446587428904767),
 ///         (14.4, 31.0),
@@ -64,6 +65,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use geo_types::{line_string, polygon, LineString, Polygon};
 
     use crate::MinimumRotatedRect;
@@ -74,7 +76,7 @@ mod test {
         let mbr = MinimumRotatedRect::minimum_rotated_rect(&poly).unwrap();
         assert_eq!(
             mbr.exterior(),
-            &LineString::from(vec![
+            &LineString::from(rvec![
                 (1.7000000000000006, 24.6),
                 (1.4501458363715918, 30.446587428904767),
                 (14.4, 31.0),
@@ -89,7 +91,7 @@ mod test {
         let mbr = MinimumRotatedRect::minimum_rotated_rect(&poly).unwrap();
         assert_eq!(
             mbr.exterior(),
-            &LineString::from(vec![
+            &LineString::from(rvec![
                 (1.7000000000000006, 24.6),
                 (1.4501458363715918, 30.446587428904767),
                 (14.4, 31.0),

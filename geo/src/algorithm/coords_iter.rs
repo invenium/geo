@@ -22,9 +22,10 @@ pub trait CoordsIter {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo::coords_iter::CoordsIter;
     ///
-    /// let multi_point = geo::MultiPoint::new(vec![
+    /// let multi_point = geo::MultiPoint::new(rvec![
     ///     geo::point!(x: -10., y: 0.),
     ///     geo::point!(x: 20., y: 20.),
     ///     geo::point!(x: 30., y: 40.),
@@ -653,6 +654,7 @@ impl<'a, T: CoordNum + Debug> fmt::Debug for GeometryExteriorCoordsIter<'a, T> {
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::CoordsIter;
     use crate::{
         coord, line_string, point, polygon, Coord, Geometry, GeometryCollection, Line, LineString,
@@ -675,7 +677,7 @@ mod test {
         let coords = line.coords_iter().collect::<Vec<_>>();
 
         assert_eq!(
-            vec![coord! { x: 1., y: 2. }, coord! { x: 2., y: 3. },],
+            rvec![coord! { x: 1., y: 2. }, coord! { x: 2., y: 3. },],
             coords
         );
     }
@@ -705,7 +707,7 @@ mod test {
         expected_coords.append(&mut coords.clone());
         expected_coords.append(&mut coords);
 
-        let actual_coords = MultiPoint::new(vec![point, point])
+        let actual_coords = MultiPoint::new(rvec![point, point])
             .coords_iter()
             .collect::<Vec<_>>();
 
@@ -719,7 +721,7 @@ mod test {
         expected_coords.append(&mut coords.clone());
         expected_coords.append(&mut coords);
 
-        let actual_coords = MultiLineString::new(vec![line_string.clone(), line_string])
+        let actual_coords = MultiLineString::new(rvec![line_string.clone(), line_string])
             .coords_iter()
             .collect::<Vec<_>>();
 
@@ -733,7 +735,7 @@ mod test {
         expected_coords.append(&mut coords.clone());
         expected_coords.append(&mut coords);
 
-        let actual_coords = MultiPolygon::new(vec![polygon.clone(), polygon])
+        let actual_coords = MultiPolygon::new(rvec![polygon.clone(), polygon])
             .coords_iter()
             .collect::<Vec<_>>();
 
@@ -777,7 +779,7 @@ mod test {
         let (polygon, mut coords) = create_polygon();
         expected_coords.append(&mut coords);
 
-        let actual_coords = GeometryCollection::new_from(vec![
+        let actual_coords = GeometryCollection::new_from(rvec![
             Geometry::LineString(line_string),
             Geometry::Polygon(polygon),
         ])

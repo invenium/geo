@@ -1,3 +1,4 @@
+use abi_stable::std_types::RVec;
 use geo_types::{
     Geometry, GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
     Polygon,
@@ -28,7 +29,7 @@ where
     T: postgis::LineString<'a>,
 {
     fn from_postgis(ls: &'a T) -> Self {
-        let ret: Vec<Point> = ls.points().map(Point::from_postgis).collect();
+        let ret: RVec<Point> = ls.points().map(Point::from_postgis).collect();
         LineString::from(ret)
     }
 }
@@ -42,7 +43,7 @@ where
         let mut rings = poly
             .rings()
             .map(LineString::from_postgis)
-            .collect::<Vec<_>>();
+            .collect::<RVec<_>>();
         if rings.is_empty() {
             return None;
         }

@@ -90,14 +90,15 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use crate::euclidean_distance::EuclideanDistance;
     use crate::FrechetDistance;
     use crate::LineString;
 
     #[test]
     fn test_single_point_in_linestring() {
-        let ls_a = LineString::from(vec![(1., 1.)]);
-        let ls_b = LineString::from(vec![(0., 2.)]);
+        let ls_a = LineString::from(rvec![(1., 1.)]);
+        let ls_b = LineString::from(rvec![(0., 2.)]);
         assert_relative_eq!(
             (ls_a.clone().into_points())[0].euclidean_distance(&(&ls_b.clone().into_points())[0]),
             ls_a.frechet_distance(&ls_b)
@@ -106,29 +107,29 @@ mod test {
 
     #[test]
     fn test_identical_linestrings() {
-        let ls_a = LineString::from(vec![(1., 1.), (2., 1.), (2., 2.)]);
-        let ls_b = LineString::from(vec![(1., 1.), (2., 1.), (2., 2.)]);
+        let ls_a = LineString::from(rvec![(1., 1.), (2., 1.), (2., 2.)]);
+        let ls_b = LineString::from(rvec![(1., 1.), (2., 1.), (2., 2.)]);
         assert_relative_eq!(0., ls_a.frechet_distance(&ls_b));
     }
 
     #[test]
     fn different_dimensions_linestrings() {
-        let ls_a = LineString::from(vec![(1., 1.)]);
-        let ls_b = LineString::from(vec![(2., 2.), (0., 1.)]);
+        let ls_a = LineString::from(rvec![(1., 1.)]);
+        let ls_b = LineString::from(rvec![(2., 2.), (0., 1.)]);
         assert_relative_eq!(2f64.sqrt(), ls_a.frechet_distance(&ls_b));
     }
 
     #[test]
     fn test_frechet_1() {
-        let ls_a = LineString::from(vec![(1., 1.), (2., 1.)]);
-        let ls_b = LineString::from(vec![(2., 2.), (2., 3.)]);
+        let ls_a = LineString::from(rvec![(1., 1.), (2., 1.)]);
+        let ls_b = LineString::from(rvec![(2., 2.), (2., 3.)]);
         assert_relative_eq!(2., ls_a.frechet_distance(&ls_b));
     }
 
     #[test]
     fn test_frechet_2() {
-        let ls_a = LineString::from(vec![(1., 1.), (2., 1.), (2., 2.)]);
-        let ls_b = LineString::from(vec![(2., 2.), (0., 1.), (2., 4.)]);
+        let ls_a = LineString::from(rvec![(1., 1.), (2., 1.), (2., 2.)]);
+        let ls_b = LineString::from(rvec![(2., 2.), (0., 1.), (2., 4.)]);
         assert_relative_eq!(2., ls_a.frechet_distance(&ls_b));
     }
 }

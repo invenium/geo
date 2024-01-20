@@ -81,6 +81,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use super::*;
     use crate::{coord, polygon, MultiPoint};
 
@@ -122,7 +123,7 @@ mod test {
 
     #[test]
     fn empty() {
-        let multi_point: MultiPoint<f32> = MultiPoint::new(vec![]);
+        let multi_point: MultiPoint<f32> = MultiPoint::new(rvec![]);
 
         let actual = multi_point.extremes();
 

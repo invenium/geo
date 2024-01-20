@@ -57,6 +57,7 @@ where
 
 #[cfg(test)]
 mod test {
+    use abi_stable::rvec;
     use crate::line_string;
     use crate::EuclideanLength;
     use crate::{coord, Line, MultiLineString};
@@ -85,7 +86,7 @@ mod test {
     }
     #[test]
     fn multilinestring_test() {
-        let mline = MultiLineString::new(vec![
+        let mline = MultiLineString::new(rvec![
             line_string![
                 (x: 1., y: 0.),
                 (x: 7., y: 0.),

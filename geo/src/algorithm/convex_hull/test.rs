@@ -203,7 +203,7 @@ fn test_three_collinear_points_include_on_hull() {
 
 #[test]
 fn convex_hull_multipoint_test() {
-    let v = vec![
+    let v = rvec![
         Point::new(0, 10),
         Point::new(1, 1),
         Point::new(10, 0),
@@ -215,7 +215,7 @@ fn convex_hull_multipoint_test() {
         Point::new(0, 10),
     ];
     let mp = MultiPoint::new(v);
-    let correct = vec![
+    let correct = rvec![
         Coord::from((0, -10)),
         Coord::from((10, 0)),
         Coord::from((0, 10)),
@@ -252,7 +252,7 @@ fn convex_hull_linestring_test() {
 fn convex_hull_multilinestring_test() {
     let v1 = line_string![(x: 0.0, y: 0.0), (x: 1.0, y: 10.0)];
     let v2 = line_string![(x: 1.0, y: 10.0), (x: 2.0, y: 0.0), (x: 3.0, y: 1.0)];
-    let mls = MultiLineString::new(vec![v1, v2]);
+    let mls = MultiLineString::new(rvec![v1, v2]);
     let correct = vec![
         Coord::from((2.0, 0.0)),
         Coord::from((3.0, 1.0)),
@@ -267,7 +267,7 @@ fn convex_hull_multilinestring_test() {
 fn convex_hull_multipolygon_test() {
     let p1 = polygon![(x: 0.0, y: 0.0), (x: 1.0, y: 10.0), (x: 2.0, y: 0.0), (x: 0.0, y: 0.0)];
     let p2 = polygon![(x: 3.0, y: 0.0), (x: 4.0, y: 10.0), (x: 5.0, y: 0.0), (x: 3.0, y: 0.0)];
-    let mp = MultiPolygon::new(vec![p1, p2]);
+    let mp = MultiPolygon::new(rvec![p1, p2]);
     let correct = vec![
         Coord::from((5.0, 0.0)),
         Coord::from((4.0, 10.0)),
@@ -281,7 +281,7 @@ fn convex_hull_multipolygon_test() {
 
 #[test]
 fn collection() {
-    let collection = GeometryCollection(vec![
+    let collection = GeometryCollection(rvec![
         Point::new(0.0, 0.0).into(),
         Triangle::new(
             coord! { x: 1.0, y: 0.0},

@@ -61,12 +61,12 @@ macro_rules! wkt_internal {
         $crate::polygon![]
     };
     (POLYGON ( $exterior_tt: tt )) => {
-        $crate::Polygon::new($crate::wkt!(LINESTRING $exterior_tt), $crate::_alloc::vec![])
+        $crate::Polygon::new($crate::wkt!(LINESTRING $exterior_tt), $crate::_alloc::rvec![])
     };
     (POLYGON( $exterior_tt: tt, $($interiors_tt: tt),+ )) => {
         $crate::Polygon::new(
             $crate::wkt!(LINESTRING $exterior_tt),
-            $crate::_alloc::vec![
+            $crate::_alloc::rvec![
                $($crate::wkt!(LINESTRING $interiors_tt)),*
             ]
         )
@@ -78,27 +78,27 @@ macro_rules! wkt_internal {
         compile_error!("Invalid POLYGON wkt");
     };
     (MULTIPOINT EMPTY) => {
-        $crate::MultiPoint($crate::_alloc::vec![])
+        $crate::MultiPoint($crate::_alloc::rvec![])
     };
     (MULTIPOINT ()) => {
         compile_error!("use `EMPTY` instead of () for an empty collection")
     };
     (MULTIPOINT ($($x: literal $y: literal),* )) => {
         $crate::MultiPoint(
-            $crate::_alloc::vec![$($crate::point!(x: $x, y: $y)),*]
+            $crate::_alloc::rvec![$($crate::point!(x: $x, y: $y)),*]
         )
     };
     (MULTIPOINT $($tail: tt)*) => {
         compile_error!("Invalid MULTIPOINT wkt");
     };
     (MULTILINESTRING EMPTY) => {
-        $crate::MultiLineString($crate::_alloc::vec![])
+        $crate::MultiLineString($crate::_alloc::rvec![])
     };
     (MULTILINESTRING ()) => {
         compile_error!("use `EMPTY` instead of () for an empty collection")
     };
     (MULTILINESTRING ( $($line_string_tt: tt),* )) => {
-        $crate::MultiLineString($crate::_alloc::vec![
+        $crate::MultiLineString($crate::_alloc::rvec![
            $($crate::wkt!(LINESTRING $line_string_tt)),*
         ])
     };
@@ -106,13 +106,13 @@ macro_rules! wkt_internal {
         compile_error!("Invalid MULTILINESTRING wkt");
     };
     (MULTIPOLYGON EMPTY) => {
-        $crate::MultiPolygon($crate::_alloc::vec![])
+        $crate::MultiPolygon($crate::_alloc::rvec![])
     };
     (MULTIPOLYGON ()) => {
         compile_error!("use `EMPTY` instead of () for an empty collection")
     };
     (MULTIPOLYGON ( $($polygon_tt: tt),* )) => {
-        $crate::MultiPolygon($crate::_alloc::vec![
+        $crate::MultiPolygon($crate::_alloc::rvec![
            $($crate::wkt!(POLYGON $polygon_tt)),*
         ])
     };
@@ -120,13 +120,13 @@ macro_rules! wkt_internal {
         compile_error!("Invalid MULTIPOLYGON wkt");
     };
     (GEOMETRYCOLLECTION EMPTY) => {
-        $crate::GeometryCollection($crate::_alloc::vec![])
+        $crate::GeometryCollection($crate::_alloc::rvec![])
     };
     (GEOMETRYCOLLECTION ()) => {
         compile_error!("use `EMPTY` instead of () for an empty collection")
     };
     (GEOMETRYCOLLECTION ( $($el_type:tt $el_tt: tt),* )) => {
-        $crate::GeometryCollection($crate::_alloc::vec![
+        $crate::GeometryCollection($crate::_alloc::rvec![
            $($crate::Geometry::from($crate::wkt!($el_type $el_tt))),*
         ])
     };
@@ -141,7 +141,7 @@ macro_rules! wkt_internal {
 #[cfg(test)]
 mod test {
     use crate::geometry::*;
-    use alloc::vec;
+    use abi_stable::rvec;
 
     #[test]
     fn point() {
@@ -220,19 +220,19 @@ mod test {
     #[test]
     fn multi_point() {
         let multi_point = wkt! { MULTIPOINT(1.0 2.0) };
-        assert_eq!(multi_point.0, vec![point! { x: 1.0, y: 2.0}]);
+        assert_eq!(multi_point.0, rvec![point! { x: 1.0, y: 2.0}]);
 
         let multi_point = wkt! { MULTIPOINT(1.0 2.0,3.0 4.0) };
         assert_eq!(
             multi_point.0,
-            vec![point! { x: 1.0, y: 2.0}, point! { x: 3.0, y: 4.0}]
+            rvec![point! { x: 1.0, y: 2.0}, point! { x: 3.0, y: 4.0}]
         );
     }
 
     #[test]
     fn empty_multi_line_string() {
         let multi_line_string: MultiLineString = wkt! { MULTILINESTRING EMPTY };
-        assert_eq!(multi_line_string.0, vec![]);
+        assert_eq!(multi_line_string.0, rvec![]);
         // This (rightfully) fails to compile because its invalid wkt
         // wkt! { MULTILINESTRING() }
     }

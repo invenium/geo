@@ -21,10 +21,11 @@ pub trait GeodesicLength<T, RHS = Self> {
     /// # Examples
     ///
     /// ```
+    /// use abi_stable::rvec;
     /// use geo::prelude::*;
     /// use geo::LineString;
     ///
-    /// let linestring = LineString::from(vec![
+    /// let linestring = LineString::from(rvec![
     ///     // New York City
     ///     (-74.006, 40.7128),
     ///     // London

@@ -30,7 +30,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     c.bench_function("point inside complex polygon", |bencher| {
-        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), vec![]);
+        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), rvec![]);
         let point = geo_test_fixtures::baton_rouge();
         bencher.iter(|| {
             assert!(criterion::black_box(&polygon).contains(criterion::black_box(&point)));
@@ -40,7 +40,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function(
         "point outside, but within bbox, of complex polygon",
         |bencher| {
-            let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), vec![]);
+            let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), rvec![]);
             // lake borgne - near and mostly surrounded by, but not inside of, Louisiana
             let point = point!(x: -89.641854, y: 30.026283);
             bencher.iter(|| {
@@ -50,7 +50,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
 
     c.bench_function("point outside bbox of complex polygon", |bencher| {
-        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), vec![]);
+        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), rvec![]);
         let point = point!(x: 2.3522, y: 48.8566);
         bencher.iter(|| {
             assert!(!criterion::black_box(&polygon).contains(criterion::black_box(&point)));
@@ -89,7 +89,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
 
     c.bench_function("line across complex polygon", |bencher| {
-        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), vec![]);
+        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), rvec![]);
         // crossing part of, but not contained by Louisiana
         let line = Line::new(
             geo_test_fixtures::baton_rouge(),
@@ -101,7 +101,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     c.bench_function("complex polygon contains polygon", |bencher| {
-        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), vec![]);
+        let polygon = Polygon::<f64>::new(geo_test_fixtures::louisiana(), rvec![]);
         let contained_polygon = geo_test_fixtures::east_baton_rouge();
 
         bencher.iter(|| {

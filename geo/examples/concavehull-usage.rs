@@ -4,6 +4,8 @@ use geo::{Coord, Point};
 use geo_types::MultiPoint;
 use std::fs::File;
 use std::io::Write;
+use abi_stable::rvec;
+use abi_stable::std_types::RVec;
 
 fn generate_polygon_str(coords: &[Coord]) -> String {
     let mut points_str = String::from("");
@@ -34,8 +36,8 @@ fn produce_file_content(start_str: &str, mid_str: &str) -> String {
 }
 
 //Move the points such that they're clustered around the center of the image
-fn move_points_in_viewbox(width: f64, height: f64, points: Vec<Point>) -> Vec<Point> {
-    let mut new_points = vec![];
+fn move_points_in_viewbox(width: f64, height: f64, points: RVec<Point>) -> RVec<Point> {
+    let mut new_points = rvec![];
     for point in points {
         new_points.push(Point::new(
             point.0.x + width / 2.0,
@@ -45,7 +47,7 @@ fn move_points_in_viewbox(width: f64, height: f64, points: Vec<Point>) -> Vec<Po
     new_points
 }
 
-fn map_points_to_coords(points: Vec<Point>) -> Vec<Coord> {
+fn map_points_to_coords(points: RVec<Point>) -> RVec<Coord> {
     points.iter().map(|point| point.0).collect()
 }
 
@@ -60,7 +62,7 @@ fn main() -> std::io::Result<()> {
         width, height
     );
     let norway = geo_test_fixtures::norway_main::<f64>();
-    let v: Vec<_> = norway
+    let v: RVec<_> = norway
         .0
         .into_iter()
         .map(|coord| Point::new(coord.x, coord.y))
